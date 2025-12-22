@@ -1,0 +1,36 @@
+<template>
+  <component 
+    v-for="block in blocks" 
+    :key="block.id"
+    :is="getBlockComponent(block.collection)"
+    :data="block.data"
+  />
+</template>
+
+<script setup>
+import { computed, defineAsyncComponent } from 'vue';
+
+const props = defineProps({
+  blocks: {
+    type: Array,
+    required: true,
+    default: () => []
+  }
+});
+
+// Dynamically import block components
+const blockComponents = {
+  'block_textslider': defineAsyncComponent(() => import('./blocks/TextSlider.vue')),
+  'block_processflow': defineAsyncComponent(() => import('./blocks/ProcessFlow.vue')),
+  'block_branded': defineAsyncComponent(() => import('./blocks/Branded.vue')),
+  'block_masthead': defineAsyncComponent(() => import('./blocks/MastheadBlock.vue')),
+  'block_hero': defineAsyncComponent(() => import('./blocks/HeroBlock.vue')),
+  'block_features': defineAsyncComponent(() => import('./blocks/FeaturesBlock.vue')),
+  'block_content': defineAsyncComponent(() => import('./blocks/ContentBlock.vue')),
+  'block_cta': defineAsyncComponent(() => import('./blocks/CtaBlock.vue'))
+};
+
+const getBlockComponent = (collection) => {
+  return blockComponents[collection] || 'div';
+};
+</script>

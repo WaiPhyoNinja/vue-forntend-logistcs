@@ -221,7 +221,7 @@ onMounted(async () => {
     
     if (footerResponse && footerResponse.length > 0) {
       footerData.value = footerResponse[0];
-      console.log('Footer data loaded:', footerData.value);
+      
     }
 
     // Fetch social icons from Directus
@@ -234,7 +234,7 @@ onMounted(async () => {
     
     if (socialResponse && socialResponse.length > 0) {
       socialIcons.value = socialResponse;
-      console.log('Social icons loaded:', socialIcons.value);
+     
     }
 
     // Fetch quick links menu from Directus
@@ -248,8 +248,7 @@ onMounted(async () => {
     if (menuResponse && menuResponse.length > 0) {
       quickLinksMenuData.value = menuResponse[0];
       quickLinksMenu.value = menuResponse[0].items || [];
-      console.log('Quick links menu loaded:', quickLinksMenu.value);
-      console.log('Quick links menu data:', quickLinksMenuData.value);
+    
     }
 
     // Fetch services menu from Directus
@@ -263,7 +262,7 @@ onMounted(async () => {
     if (servicesResponse && servicesResponse.length > 0) {
       servicesMenuData.value = servicesResponse[0];
       servicesMenu.value = servicesResponse[0].items || [];
-      console.log('Services menu loaded:', servicesMenu.value);
+    
     }
   } catch (error) {
     console.error('Error fetching data:', error);

@@ -82,8 +82,6 @@ onMounted(async () => {
     
     if (response && response.length > 0) {
       locationData.value = response[0];
-      console.log('Location data loaded:', locationData.value);
-      console.log('Current translation:', currentTranslation.value);
     }
 
     // Fetch social icons from Directus
@@ -96,7 +94,7 @@ onMounted(async () => {
     
     if (socialResponse && socialResponse.length > 0) {
       socialIcons.value = socialResponse;
-      console.log('Social icons loaded:', socialIcons.value);
+      
     }
 
     // Fetch menu from Directus
@@ -109,7 +107,7 @@ onMounted(async () => {
     
     if (menuResponse && menuResponse.length > 0) {
       menuItems.value = menuResponse[0].items || [];
-      console.log('Menu items loaded:', menuItems.value);
+      
     }
 
     // Close dropdown when clicking outside
