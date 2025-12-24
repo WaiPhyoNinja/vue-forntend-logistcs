@@ -9,7 +9,7 @@
                     <div class="section-title__shape-1">
                         <i class="fas fa-plane"></i>
                     </div>
-                    <h6 class="section-title__tagline">{{ translatedContent.sub_title }}</h6>
+                    <h6 class="section-title__tagline">{{ translatedContent.title }}</h6>
                     <span class="section-title__tagline-border"></span>
                     <div class="section-title__shape-2">
                         <i class="fas fa-plane"></i>
@@ -52,25 +52,18 @@ const translatedContent = computed(() => {
   return getTranslation(props.data?.translations);
 });
 
-// Get process items from the content
+// Get process items from the repeater content field
 const processItems = computed(() => {
-  if (!translatedContent.value?.content) return [];
-  
-  const content = translatedContent.value.content;
-  
-  // If content has translations array, get all translations for current language
-  if (content.translations && Array.isArray(content.translations)) {
-    return content.translations
-      .filter(t => t.languages_code === currentLanguage.value)
-      .map(translation => ({
-        icon: getIconClass(translation.number),
-        title: translation.title,
-        content: translation.content,
-        image: content.image
-      }));
+  if (!translatedContent.value?.content || !Array.isArray(translatedContent.value.content)) {
+    return [];
   }
   
-  return [];
+  return translatedContent.value.content.map((item, index) => ({
+    icon: getIconClass(item.number || String(index + 1).padStart(2, '0')),
+    title: item.title || '',
+    content: item.description || '',
+    number: item.number || String(index + 1).padStart(2, '0')
+  }));
 });
 
 // Map process numbers to icon classes
@@ -97,6 +90,43 @@ const stripHtml = (html) => {
   tmp.innerHTML = html;
   return tmp.textContent || tmp.innerText || '';
 };
-</script><style scoped>
-/* All styles are loaded from the main CSS files */
+</script>
+<style scoped>
+/* Myanmar Language Font Sizes */
+body.myanmar-lang .section-title__tagline {
+  font-size: 20px;
+}
+
+body.myanmar-lang .section-title__title {
+  font-size: 32px;
+  line-height: 1.3;
+}
+
+body.myanmar-lang .process-one__title {
+  font-size: 16px;
+}
+
+body.myanmar-lang .process-one__text {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Thai Language Font Sizes */
+body.thai-lang .section-title__tagline {
+  font-size: 13px;
+}
+
+body.thai-lang .section-title__title {
+  font-size: 32px;
+  line-height: 1.3;
+}
+
+body.thai-lang .process-one__title {
+  font-size: 16px;
+}
+
+body.thai-lang .process-one__text {
+  font-size: 13px;
+  line-height: 1.6;
+}
 </style>

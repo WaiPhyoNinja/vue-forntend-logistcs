@@ -35,7 +35,7 @@ export function useBlocks() {
           const blockPromises = page.blocks.map(async (block) => {
             // Skip if block or item is null/undefined
             if (!block || !block.item) {
-              console.warn('Skipping invalid block:', block);
+              console.warn(`Skipping ${block?.collection || 'unknown'} block - item is null or deleted`);
               return null;
             }
             
@@ -57,18 +57,17 @@ export function useBlocks() {
               fields = ['*', 'images.id', 'images.directus_files_id'];
             }
             
-            // For block_processflow, fetch nested content and translations
+            // For block_processflow, fetch translations with content repeater
             if (block.collection === 'block_processflow') {
-              fields = ['*', 'translations.*', 'translations.content.*', 'translations.content.translations.*'];
+              fields = ['*', 'translations.*'];
             }
-            
             const blockData = await directus.request(
               readItems(block.collection, {
                 fields: fields,
                 filter: { id: { _eq: itemId } }
               })
             );
-            
+        
             return {
               id: block.id,
               collection: block.collection,
