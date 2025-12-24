@@ -105,6 +105,13 @@
 
                                 <div class="col-xl-12">
                                     <div class="input-box">
+                                        <input type="text" v-model="formData.transport_id" placeholder="Transport ID (Optional)">
+                                        <div class="icon"><span class="icon-box1"></span></div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-12">
+                                    <div class="input-box">
                                         <textarea v-model="formData.address" placeholder="Content" required></textarea>
                                         <div class="icon style2"><span class="icon-location"></span></div>
                                     </div>
@@ -157,8 +164,8 @@ const formData = ref({
   email: '',
   phone: '',
   subject: '',
+  transport_id: '',
   address: '',
-  transport_id: null,
   reply_status: 'pending'
 });
 
@@ -180,7 +187,7 @@ const handleSubmit = async () => {
         phone: formData.value.phone,
         subject: formData.value.subject,
         address: formData.value.address,
-        transport_id: formData.value.transport_id,
+        transport_id: formData.value.transport_id || null,
         reply_status: 'pending'
       })
     );
@@ -188,7 +195,7 @@ const handleSubmit = async () => {
     // Show success with SweetAlert
     Swal.fire({
       title: 'Success!',
-      text: 'Your request has been submitted successfully!',
+      text: 'Your contact us has been submitted successfully!',
       icon: 'success',
       confirmButtonText: 'OK',
       confirmButtonColor: '#e03e2d'
@@ -200,8 +207,8 @@ const handleSubmit = async () => {
       email: '',
       phone: '',
       subject: '',
+      transport_id: '',
       address: '',
-      transport_id: null,
       reply_status: 'pending'
     };
   } catch (error) {
@@ -210,7 +217,7 @@ const handleSubmit = async () => {
     // Show error with SweetAlert
     Swal.fire({
       title: 'Error!',
-      text: 'Failed to submit your request. Please try again.',
+      text: 'Failed to submit your contact us. Please try again.',
       icon: 'error',
       confirmButtonText: 'OK',
       confirmButtonColor: '#e03e2d'
