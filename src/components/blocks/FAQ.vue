@@ -151,6 +151,10 @@ body.myanmar-lang .faq-one__experience-text {
     font-size: 13px;
 }
 
+body.myanmar-lang .odometer-value {
+     font-size: 20px;
+}
+
 /* Thai Language Font Sizes */
 body.thai-lang .section-title__tagline {
     font-size: 13px;

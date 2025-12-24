@@ -61,6 +61,11 @@ export function useBlocks() {
             if (block.collection === 'block_processflow') {
               fields = ['*', 'translations.*'];
             }
+            
+            // For block_services, fetch services with translations
+            if (block.collection === 'block_services') {
+              fields = ['*', 'translations.*', 'services.services_id.*', 'services.services_id.translations.*'];
+            }
             const blockData = await directus.request(
               readItems(block.collection, {
                 fields: fields,

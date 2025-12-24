@@ -20,6 +20,7 @@ const props = defineProps({
 
 // Dynamically import block components
 const blockComponents = {
+  'block_quotes': defineAsyncComponent(() => import('./blocks/Quote.vue')),
   'block_services': defineAsyncComponent(() => import('./blocks/Services.vue')),
   'block_faqs': defineAsyncComponent(() => import('./blocks/FAQ.vue')),
   'block_textslider': defineAsyncComponent(() => import('./blocks/TextSlider.vue')),
