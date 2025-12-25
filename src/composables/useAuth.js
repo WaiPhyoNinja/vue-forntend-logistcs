@@ -66,8 +66,8 @@ export function useAuth() {
   // Register function
   const register = async (userData) => {
     try {
-      // Note: Make sure PUBLIC_REGISTRATION=true in Directus .env
-      // And PUBLIC_REGISTRATION_ROLE is set to customer role UUID
+      // Customer role ID from Directus
+      const CUSTOMER_ROLE_ID = '9162cd13-ae93-4c85-bba9-8d388f2cf1f2';
       
       const response = await fetch('http://0.0.0.0:8055/users', {
         method: 'POST',
@@ -78,19 +78,51 @@ export function useAuth() {
           email: userData.email,
           password: userData.password,
           first_name: userData.firstName,
-          last_name: userData.lastName
+          last_name: userData.lastName,
+          role: CUSTOMER_ROLE_ID,
+          status: 'active'
         })
       });
 
-      const data = await response.json();
+      console.log('Registration response status:', response.status);
+
+      // Safely parse JSON response
+      let data = null;
+      const text = await response.text();
+      
+      if (text) {
+        try {
+          data = JSON.parse(text);
+          console.log('Registration response data:', data);
+        } catch (parseError) {
+          console.error('Failed to parse response as JSON:', text);
+        }
+      } else {
+        console.log('Empty response body (likely 204 No Content - success)');
+      }
 
       if (response.ok) {
+        console.log('Registration successful (status:', response.status, '), attempting auto-login');
         // Auto login after registration
         return await login(userData.email, userData.password);
       } else {
+        // Handle error responses
+        let errorMessage = 'Registration failed.';
+        
+        if (response.status === 403) {
+          errorMessage = 'Registration is currently disabled. Please contact the administrator to enable PUBLIC_REGISTRATION in Directus settings.';
+        } else if (response.status === 422) {
+          errorMessage = data?.errors?.[0]?.message || 'This email is already registered or the data is invalid.';
+        } else if (response.status === 400) {
+          errorMessage = data?.errors?.[0]?.message || 'Invalid registration data. Please check your information.';
+        } else if (data?.errors && data.errors.length > 0) {
+          errorMessage = data.errors[0].message;
+        } else {
+          errorMessage = data?.errors?.[0]?.message || 'Registration failed. Please try again.';
+        }
         return {
           success: false,
-          error: data.errors?.[0]?.message || 'Registration failed. Make sure PUBLIC_REGISTRATION is enabled in Directus.'
+          error: errorMessage
         };
       }
     } catch (error) {
