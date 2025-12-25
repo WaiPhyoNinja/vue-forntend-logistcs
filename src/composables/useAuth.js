@@ -24,6 +24,22 @@ export function useAuth() {
 
       const data = await response.json();
 
+      // Handle 401 Unauthorized
+      if (response.status === 401) {
+        return {
+          success: false,
+          error: 'Invalid email or password. Please check your credentials and try again.'
+        };
+      }
+
+      // Handle other error responses
+      if (!response.ok) {
+        return {
+          success: false,
+          error: data.errors?.[0]?.message || 'Login failed. Please try again.'
+        };
+      }
+
       if (data.data && data.data.access_token) {
         token.value = data.data.access_token;
         localStorage.setItem('auth_token', data.data.access_token);
@@ -42,7 +58,7 @@ export function useAuth() {
       console.error('Login error:', error);
       return { 
         success: false, 
-        error: error.message || 'Login failed' 
+        error: 'Unable to connect to the server. Please check your internet connection.' 
       };
     }
   };

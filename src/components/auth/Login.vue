@@ -165,9 +165,24 @@ const handleSubmit = async () => {
             // Redirect to home or dashboard
             router.push('/');
         } else {
+            // Show error alert
+            Swal.fire({
+                title: t.value.error || 'Error',
+                text: result.error || 'An error occurred. Please try again.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#e03e2d'
+            });
             errorMessage.value = result.error;
         }
     } catch (error) {
+        Swal.fire({
+            title: t.value.error || 'Error',
+            text: 'An unexpected error occurred. Please try again.',
+            icon: 'error',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#e03e2d'
+        });
         errorMessage.value = 'An unexpected error occurred';
         console.error('Auth error:', error);
     } finally {
