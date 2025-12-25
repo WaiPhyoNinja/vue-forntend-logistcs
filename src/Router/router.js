@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Index from '../components/index.vue'
 import Login from '../components/auth/Login.vue'
 import MyAccount from '../components/MyAccount.vue'
+import ResetPassword from '../components/ResetPassword.vue'
 import { useAuth } from '@/composables/useAuth'
 
 const routes = [
@@ -14,6 +15,12 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login,
+    meta: { requiresGuest: true }
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: ResetPassword,
     meta: { requiresGuest: true }
   },
   {

@@ -200,24 +200,39 @@ export function useAuth() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ 
+          email,
+          reset_url: 'http://localhost:5174/reset-password'
+        })
       });
 
-      const data = await response.json();
+      console.log('Password reset response status:', response.status);
       
+      // Directus returns 204 No Content on success (no response body)
       if (response.ok) {
         return { success: true };
-      } else {
-        return {
-          success: false,
-          error: data.errors?.[0]?.message || 'Failed to send reset email'
-        };
       }
+      
+      // Only try to parse JSON if there's an error response
+      const text = await response.text();
+      let data = {};
+      if (text) {
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          console.log('Non-JSON response:', text);
+        }
+      }
+      
+      return {
+        success: false,
+        error: data.errors?.[0]?.message || 'Failed to send reset email. Please check if the email exists.'
+      };
     } catch (error) {
       console.error('Password reset request error:', error);
       return { 
         success: false, 
-        error: error.message || 'Failed to send reset email' 
+        error: 'Network error. Please check your connection and try again.' 
       };
     }
   };
@@ -236,21 +251,33 @@ export function useAuth() {
         })
       });
 
-      const data = await response.json();
+      console.log('Password reset response status:', response.status);
       
+      // Directus returns 204 No Content on success
       if (response.ok) {
         return { success: true };
-      } else {
-        return {
-          success: false,
-          error: data.errors?.[0]?.message || 'Failed to reset password'
-        };
       }
+      
+      // Only try to parse JSON if there's an error response
+      const text = await response.text();
+      let data = {};
+      if (text) {
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          console.log('Non-JSON response:', text);
+        }
+      }
+      
+      return {
+        success: false,
+        error: data.errors?.[0]?.message || 'Failed to reset password. The reset link may have expired.'
+      };
     } catch (error) {
       console.error('Password reset error:', error);
       return { 
         success: false, 
-        error: error.message || 'Failed to reset password' 
+        error: 'Network error. Please try again.' 
       };
     }
   };
