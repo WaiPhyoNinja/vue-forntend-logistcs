@@ -12,9 +12,29 @@
                                 <p>Fill in the details below to get an instant shipping quote</p>
                             </div>
 
+                            <!-- Step Progress Indicator -->
+                            <div class="step-progress">
+                                <div 
+                                    v-for="(step, index) in steps" 
+                                    :key="index" 
+                                    class="step-item"
+                                    :class="{ 
+                                        'active': currentStep === index + 1, 
+                                        'completed': currentStep > index + 1 
+                                    }"
+                                >
+                                    <div class="step-number">
+                                        <i v-if="currentStep > index + 1" class="fas fa-check"></i>
+                                        <span v-else>{{ index + 1 }}</span>
+                                    </div>
+                                    <div class="step-label">{{ step.label }}</div>
+                                    <div v-if="index < steps.length - 1" class="step-line"></div>
+                                </div>
+                            </div>
+
                             <form @submit.prevent="handleSubmit" class="quote-details-form">
-                                <!-- Sender Information -->
-                                <div class="form-section">
+                                <!-- Step 1: Sender Information -->
+                                <div class="form-section" v-show="currentStep === 1">
                                     <div class="section-header">
                                         <h3><i class="fas fa-user-circle"></i> Sender Information</h3>
                                     </div>
@@ -114,8 +134,8 @@
                                     </div>
                                 </div>
 
-                                <!-- Receiver Information -->
-                                <div class="form-section">
+                                <!-- Step 2: Receiver Information -->
+                                <div class="form-section" v-show="currentStep === 2">
                                     <div class="section-header">
                                         <h3><i class="fas fa-map-marker-alt"></i> Receiver Information</h3>
                                     </div>
@@ -216,8 +236,8 @@
                                     </div>
                                 </div>
 
-                                <!-- Shipment Details -->
-                                <div class="form-section">
+                                <!-- Step 3: Shipment Details -->
+                                <div class="form-section" v-show="currentStep === 3">
                                     <div class="section-header">
                                         <h3><i class="fas fa-box"></i> Shipment Details</h3>
                                     </div>
@@ -333,16 +353,35 @@
                                     </div>
                                 </div>
 
-                                <!-- Submit Buttons -->
+                                <!-- Navigation Buttons -->
                                 <div class="row">
                                     <div class="col-xl-12">
                                         <div class="quote-form-btns">
-                                            <button type="button" @click="resetForm" class="thm-btn btn-outline">
-                                                Reset Form
-                                                <span><i class="icon-reload"></i></span>
+                                            <button 
+                                                v-if="currentStep > 1" 
+                                                type="button" 
+                                                @click="prevStep" 
+                                                class="thm-btn btn-outline"
+                                            >
+                                                <span><i class="fas fa-arrow-left"></i></span>
+                                                Previous
                                             </button>
-                                            <button type="submit" class="thm-btn" :disabled="isSubmitting">
-                                                {{ isSubmitting ? 'Submitting...' : 'Get Quote' }}
+                                            <button 
+                                                v-if="currentStep < 3" 
+                                                type="button" 
+                                                @click="nextStep" 
+                                                class="thm-btn"
+                                            >
+                                                Next Step
+                                                <span><i class="fas fa-arrow-right"></i></span>
+                                            </button>
+                                            <button 
+                                                v-if="currentStep === 3" 
+                                                type="submit" 
+                                                class="thm-btn" 
+                                                :disabled="isSubmitting"
+                                            >
+                                                {{ isSubmitting ? 'Submitting...' : 'Submit Quote Request' }}
                                                 <span><i class="icon-right-arrow"></i></span>
                                             </button>
                                         </div>
@@ -485,6 +524,13 @@ import Footer from '../layouts/Footer.vue'
 import Header from '../layouts/Header.vue'
 
 const isSubmitting = ref(false)
+const currentStep = ref(1)
+
+const steps = [
+    { label: 'Sender Info', icon: 'fa-user-circle' },
+    { label: 'Receiver Info', icon: 'fa-map-marker-alt' },
+    { label: 'Shipment Details', icon: 'fa-box' }
+]
 
 const formData = ref({
     sender: {
@@ -554,6 +600,7 @@ const handleSubmit = async () => {
 
         alert('Quote request submitted successfully! We will contact you within 24 hours.')
         resetForm()
+        currentStep.value = 1
     } catch (error) {
         console.error('Error submitting quote:', error)
         alert('An error occurred. Please try again.')
@@ -562,7 +609,42 @@ const handleSubmit = async () => {
     }
 }
 
+const nextStep = () => {
+    if (validateCurrentStep()) {
+        if (currentStep.value < 3) {
+            currentStep.value++
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+    }
+}
+
+const prevStep = () => {
+    if (currentStep.value > 1) {
+        currentStep.value--
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+}
+
+const validateCurrentStep = () => {
+    // Basic validation for each step
+    if (currentStep.value === 1) {
+        const { firstName, lastName, email, phone, address, city, state, country } = formData.value.sender
+        if (!firstName || !lastName || !email || !phone || !address || !city || !state || !country) {
+            alert('Please fill in all required sender information fields.')
+            return false
+        }
+    } else if (currentStep.value === 2) {
+        const { firstName, lastName, email, phone, address, city, state, country } = formData.value.receiver
+        if (!firstName || !lastName || !email || !phone || !address || !city || !state || !country) {
+            alert('Please fill in all required receiver information fields.')
+            return false
+        }
+    }
+    return true
+}
+
 const resetForm = () => {
+    currentStep.value = 1
     formData.value = {
         sender: {
             firstName: '',
@@ -634,6 +716,88 @@ const resetForm = () => {
 .quote-title p {
     color: #666;
     margin: 0;
+}
+
+/* Step Progress Indicator */
+.step-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding: 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+    position: relative;
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+}
+
+.step-item.active .step-number {
+    background: #fff;
+    color: #667eea;
+    border-color: #fff;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.step-item.completed .step-number {
+    background: #28a745;
+    border-color: #28a745;
+}
+
+.step-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.step-item.active .step-label {
+    color: #fff;
+    font-size: 15px;
+}
+
+.step-item.completed .step-label {
+    color: #fff;
+}
+
+.step-line {
+    position: absolute;
+    top: 25px;
+    left: 50%;
+    width: 100%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.3);
+    z-index: -1;
+    transition: all 0.3s ease;
+}
+
+.step-item.completed .step-line {
+    background: #28a745;
 }
 
 .form-section {
@@ -960,11 +1124,30 @@ const resetForm = () => {
     .form-section {
         padding: 20px;
     }
+
+    .step-progress {
+        padding: 20px 15px;
+    }
+
+    .step-number {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .step-label {
+        font-size: 12px;
+    }
+
+    .step-line {
+        top: 20px;
+    }
 }
 
 @media (max-width: 767px) {
     .quote-form-btns {
         flex-direction: column;
+        gap: 10px;
     }
 
     .thm-btn {
@@ -974,6 +1157,32 @@ const resetForm = () => {
 
     .quote-title h2 {
         font-size: 24px;
+    }
+
+    .step-progress {
+        padding: 15px 10px;
+    }
+
+    .step-label {
+        font-size: 11px;
+        margin-top: 5px;
+    }
+
+    .step-number {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 575px) {
+    .step-label {
+        display: none;
+    }
+
+    .step-progress {
+        justify-content: center;
+        gap: 20px;
     }
 }
 </style>
