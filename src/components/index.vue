@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, watch } from 'vue';
 import Footer from '../layouts/Footer.vue';
 import Header from '../layouts/Header.vue';
 import Chat from './Chat.vue';
@@ -14,16 +14,27 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 const { blocks, loading, fetchPageBlocks } = useBlocks();
 
-onMounted(async () => {
-  // Fetch page blocks based on current route
-  const permalink = route.path || '/';
+const loadPage = async () => {
+  // Build permalink from route params
+  let permalink = route.path;
+  
+  // Fetch page blocks based on permalink
   await fetchPageBlocks(permalink);
+};
+
+onMounted(async () => {
+  await loadPage();
 
   // Initialize Bootstrap dropdowns for language switcher
   if (window.bootstrap) {
     const dropdownElementList = document.querySelectorAll('.dropdown-toggle');
     [...dropdownElementList].map(dropdownToggleEl => new window.bootstrap.Dropdown(dropdownToggleEl));
   }
+});
+
+// Watch for route changes and reload page
+watch(() => route.path, async () => {
+  await loadPage();
 });
 </script>
 

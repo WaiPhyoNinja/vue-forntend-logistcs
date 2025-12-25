@@ -4,13 +4,20 @@ import { ref, onMounted, computed, watch } from 'vue';
 import directus from '@/services/directus';
 import { readItems } from '@directus/sdk';
 import { useLanguage } from '@/composables/useLanguage';
+import { useAuth } from '@/composables/useAuth';
+import { useRouter } from 'vue-router';
+import Swal from 'sweetalert2';
 
 const { currentLanguage, setLanguage, initLanguage, getTranslation } = useLanguage();
+const { user, isAuthenticated, logout, checkAuth } = useAuth();
+const router = useRouter();
 const locationData = ref(null);
 const socialIcons = ref([]);
 const menuItems = ref([]);
 const isDropdownOpen = ref(false);
 const isDropdownOpenSticky = ref(false);
+const showUserDropdown = ref(false);
+const showUserDropdownSticky = ref(false);
 
 const currentTranslation = computed(() => {
   if (!locationData.value || !locationData.value.translations) return null;
@@ -67,10 +74,52 @@ const getMenuItemTranslation = (item) => {
   return getTranslation(item.translations);
 };
 
+const toggleUserDropdown = () => {
+  showUserDropdown.value = !showUserDropdown.value;
+  showUserDropdownSticky.value = false;
+};
+
+const toggleUserDropdownSticky = () => {
+  showUserDropdownSticky.value = !showUserDropdownSticky.value;
+  showUserDropdown.value = false;
+};
+
+const handleLogout = async () => {
+  const result = await Swal.fire({
+    title: 'Logout',
+    text: 'Are you sure you want to logout?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#e03e2d',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Yes, logout',
+    cancelButtonText: 'Cancel'
+  });
+
+  if (result.isConfirmed) {
+    await logout();
+    showUserDropdown.value = false;
+    showUserDropdownSticky.value = false;
+    
+    Swal.fire({
+      title: 'Logged Out',
+      text: 'You have been logged out successfully',
+      icon: 'success',
+      confirmButtonColor: '#e03e2d',
+      timer: 1500
+    });
+    
+    router.push('/');
+  }
+};
+
 onMounted(async () => {
   try {
     // Initialize language from localStorage or default to English
     initLanguage();
+    
+    // Check authentication status
+    await checkAuth();
 
     // Fetch location data from Directus
     const response = await directus.request(
@@ -201,6 +250,16 @@ onMounted(async () => {
                                         </li>
                                     </ul>
                                 </li>
+                                <!-- User Menu / Login -->
+                                <li v-if="isAuthenticated">
+                                    <a href="#" @click.prevent="router.push('/my-account')">My Account</a>
+                                </li>
+                                <li v-if="isAuthenticated">
+                                    <a href="#" @click.prevent="handleLogout">Logout</a>
+                                </li>
+                                <li v-else>
+                                    <a href="#" @click.prevent="router.push('/login')">Login</a>
+                                </li>
                             </ul>
                         </div>
                         <div class="main-menu__right">
@@ -224,6 +283,7 @@ onMounted(async () => {
                                     </div>
                                 </div>
                             </div>
+                            
                             <div class="main-menu__nav-sidebar-icon">
                                 <a class="navSidebar-button" href="#">
                                     <span class="icon-dots-menu-one"></span>
@@ -265,6 +325,16 @@ onMounted(async () => {
                                         </li>
                                     </ul>
                                 </li>
+                                <!-- User Menu / Login (Sticky) -->
+                                <li v-if="isAuthenticated">
+                                    <a href="#" @click.prevent="router.push('/my-account')">My Account</a>
+                                </li>
+                                <li v-if="isAuthenticated">
+                                    <a href="#" @click.prevent="handleLogout">Logout</a>
+                                </li>
+                                <li v-else>
+                                    <a href="#" @click.prevent="router.push('/login')">Login</a>
+                                </li>
                             </ul>
                         </div>
                         <div class="main-menu__right">
@@ -295,6 +365,7 @@ onMounted(async () => {
                                     </ul>
                                 </div>
                             </div>
+                            
                             <div class="main-menu__nav-sidebar-icon">
                                 <a class="navSidebar-button" href="#">
                                     <span class="icon-dots-menu-one"></span>
@@ -469,6 +540,7 @@ body.thai-lang li,
 body.thai-lang div {
     font-size: 1em;
 }
+
 
 body.thai-lang .main-menu__call-number,
 body.thai-lang .main-menu__top-text,
