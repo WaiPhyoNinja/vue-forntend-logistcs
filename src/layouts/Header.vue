@@ -5,12 +5,16 @@ import directus from '@/services/directus';
 import { readItems } from '@directus/sdk';
 import { useLanguage } from '@/composables/useLanguage';
 import { useAuth } from '@/composables/useAuth';
+import { useAuthTranslation } from '@/locales/auth';
+import { useMobileNav } from '@/composables/useMobileNav';
 import { useRouter } from 'vue-router';
 import Swal from 'sweetalert2';
 
 const { currentLanguage, setLanguage, initLanguage, getTranslation } = useLanguage();
 const { user, isAuthenticated, logout, checkAuth } = useAuth();
+const { toggleMobileNav } = useMobileNav();
 const router = useRouter();
+const t = computed(() => useAuthTranslation(currentLanguage.value));
 const locationData = ref(null);
 const socialIcons = ref([]);
 const menuItems = ref([]);
@@ -18,6 +22,7 @@ const isDropdownOpen = ref(false);
 const isDropdownOpenSticky = ref(false);
 const showUserDropdown = ref(false);
 const showUserDropdownSticky = ref(false);
+const showContactPopup = ref(false);
 
 const currentTranslation = computed(() => {
   if (!locationData.value || !locationData.value.translations) return null;
@@ -84,16 +89,26 @@ const toggleUserDropdownSticky = () => {
   showUserDropdown.value = false;
 };
 
+const toggleContactPopup = () => {
+  // On mobile, trigger the mobile navigation instead
+  if (window.innerWidth <= 991) {
+    toggleMobileNav();
+  } else {
+    // On desktop, show contact popup
+    showContactPopup.value = !showContactPopup.value;
+  }
+};
+
 const handleLogout = async () => {
   const result = await Swal.fire({
-    title: 'Logout',
-    text: 'Are you sure you want to logout?',
+    title: t.value.logout,
+    text: t.value.logoutConfirm,
     icon: 'question',
     showCancelButton: true,
     confirmButtonColor: '#e03e2d',
     cancelButtonColor: '#6c757d',
-    confirmButtonText: 'Yes, logout',
-    cancelButtonText: 'Cancel'
+    confirmButtonText: t.value.yes,
+    cancelButtonText: t.value.cancel
   });
 
   if (result.isConfirmed) {
@@ -102,8 +117,8 @@ const handleLogout = async () => {
     showUserDropdownSticky.value = false;
     
     Swal.fire({
-      title: 'Logged Out',
-      text: 'You have been logged out successfully',
+      title: t.value.logout,
+      text: t.value.loggedOut,
       icon: 'success',
       confirmButtonColor: '#e03e2d',
       timer: 1500
@@ -175,6 +190,13 @@ onMounted(async () => {
         isDropdownOpenSticky.value = false;
       }
     });
+
+    // Handle window resize - close contact popup if switching between mobile/desktop
+    window.addEventListener('resize', () => {
+      if (showContactPopup.value && window.innerWidth <= 991) {
+        showContactPopup.value = false;
+      }
+    });
   } catch (error) {
     console.error('Error fetching location data:', error);
   }
@@ -240,7 +262,7 @@ onMounted(async () => {
                             </div>
                         </div>
                         <div class="main-menu__main-menu-box">
-                            <a href="#" class="mobile-nav__toggler"><i class="fa fa-bars"></i></a>
+                            <a href="#" class="mobile-nav__toggler" @click.prevent="toggleMobileNav"><i class="fa fa-bars"></i></a>
                             <ul class="main-menu__list" :class="{ 'myanmar-active': currentLanguage === 'mm', 'thai-active': currentLanguage === 'th' }">
                                 <li v-for="item in menuItems" :key="item.id" :class="{ 'dropdown': item.type === 'Group' && item.sub_menu && item.sub_menu.length > 0 }">
                                     <a :href="item.url || '#'">{{ getMenuItemTranslation(item)?.title || item.url }}</a>
@@ -252,18 +274,17 @@ onMounted(async () => {
                                 </li>
                                 <!-- User Menu / Login -->
                                 <li v-if="isAuthenticated">
-                                    <a href="#" @click.prevent="router.push('/my-account')">My Account</a>
+                                    <a href="#" @click.prevent="router.push('/my-account')">{{ t.myAccount }}</a>
                                 </li>
                                 <li v-if="isAuthenticated">
-                                    <a href="#" @click.prevent="handleLogout">Logout</a>
+                                    <a href="#" @click.prevent="handleLogout">{{ t.logout }}</a>
                                 </li>
                                 <li v-else>
-                                    <a href="#" @click.prevent="router.push('/login')">Login</a>
+                                    <a href="#" @click.prevent="router.push('/login')">{{ t.login }}</a>
                                 </li>
                             </ul>
                         </div>
-                        <div class="main-menu__right">
-                            
+                        <div class="main-menu__right">                           
                             <div class="main-menu__search-cart-box">
                                 <div class="main-menu__search-cart-box">
                                     <div class="main-menu__language-box dropdown" :class="{ 'show': isDropdownOpen }">
@@ -285,7 +306,7 @@ onMounted(async () => {
                             </div>
                             
                             <div class="main-menu__nav-sidebar-icon">
-                                <a class="navSidebar-button" href="#">
+                                <a class="navSidebar-button" href="#" @click.prevent="toggleContactPopup">
                                     <span class="icon-dots-menu-one"></span>
                                     <span class="icon-dots-menu-two"></span>
                                     <span class="icon-dots-menu-three"></span>
@@ -315,7 +336,7 @@ onMounted(async () => {
                             </div>
                         </div>
                         <div class="main-menu__main-menu-box">
-                            <a href="#" class="mobile-nav__toggler"><i class="fa fa-bars"></i></a>
+                            <a href="#" class="mobile-nav__toggler" @click.prevent="toggleMobileNav"><i class="fa fa-bars"></i></a>
                             <ul class="main-menu__list" :class="{ 'myanmar-active': currentLanguage === 'mm', 'thai-active': currentLanguage === 'th' }">
                                 <li v-for="item in menuItems" :key="item.id" :class="{ 'dropdown': item.type === 'Group' && item.sub_menu && item.sub_menu.length > 0 }">
                                     <a :href="item.url || '#'">{{ getMenuItemTranslation(item)?.title || item.url }}</a>
@@ -327,13 +348,13 @@ onMounted(async () => {
                                 </li>
                                 <!-- User Menu / Login (Sticky) -->
                                 <li v-if="isAuthenticated">
-                                    <a href="#" @click.prevent="router.push('/my-account')">My Account</a>
+                                    <a href="#" @click.prevent="router.push('/my-account')">{{ t.myAccount }}</a>
                                 </li>
                                 <li v-if="isAuthenticated">
-                                    <a href="#" @click.prevent="handleLogout">Logout</a>
+                                    <a href="#" @click.prevent="handleLogout">{{ t.logout }}</a>
                                 </li>
                                 <li v-else>
-                                    <a href="#" @click.prevent="router.push('/login')">Login</a>
+                                    <a href="#" @click.prevent="router.push('/login')">{{ t.login }}</a>
                                 </li>
                             </ul>
                         </div>
@@ -367,7 +388,7 @@ onMounted(async () => {
                             </div>
                             
                             <div class="main-menu__nav-sidebar-icon">
-                                <a class="navSidebar-button" href="#">
+                                <a class="navSidebar-button" href="#" @click.prevent="toggleContactPopup">
                                     <span class="icon-dots-menu-one"></span>
                                     <span class="icon-dots-menu-two"></span>
                                     <span class="icon-dots-menu-three"></span>
@@ -382,6 +403,72 @@ onMounted(async () => {
                 </div>
             </div><!-- /.sticky-header__content -->
         </div>
+
+    <!-- Contact Popup Sidebar -->
+    <div class="contact-popup-sidebar" :class="{ 'active': showContactPopup }">
+        <div class="contact-popup-overlay" @click="showContactPopup = false"></div>
+        <div class="contact-popup-content">
+            <button class="contact-popup-close" @click="showContactPopup = false">
+                <i class="fa fa-times"></i>
+            </button>
+            
+            <div class="contact-popup-header">
+                <h3>Get In Touch</h3>
+                <p>Contact us for any inquiries</p>
+            </div>
+
+            <div class="contact-popup-body">
+                <div class="contact-info-item">
+                    <div class="icon">
+                        <i class="icon-phone-call"></i>
+                    </div>
+                    <div class="content">
+                        <h5>Phone</h5>
+                        <p><a :href="'tel:' + (currentTranslation?.phone || '')">{{ currentTranslation?.phone || '' }}</a></p>
+                    </div>
+                </div>
+
+                <div class="contact-info-item">
+                    <div class="icon">
+                        <i class="icon-email"></i>
+                    </div>
+                    <div class="content">
+                        <h5>Email</h5>
+                        <p><a :href="'mailto:' + (currentTranslation?.email || '')">{{ currentTranslation?.email || '' }}</a></p>
+                    </div>
+                </div>
+
+                <div class="contact-info-item">
+                    <div class="icon">
+                        <i class="icon-location1"></i>
+                    </div>
+                    <div class="content">
+                        <h5>Address</h5>
+                        <p>{{ currentTranslation?.address || '' }}</p>
+                    </div>
+                </div>
+
+                <div class="contact-info-item">
+                    <div class="icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="content">
+                        <h5>Opening Hours</h5>
+                        <p>{{ currentTranslation?.opening_hours || '' }}</p>
+                    </div>
+                </div>
+
+                <div class="contact-social" v-if="socialIcons.length > 0">
+                    <h5>Follow Us</h5>
+                    <div class="social-links">
+                        <a v-for="social in socialIcons" :key="social.id" :href="social.link" target="_blank" rel="noopener noreferrer">
+                            <img :src="getSocialIconUrl(social.icon)" :alt="social.link" style="width: 20px; height: 20px; object-fit: contain;">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <style scoped>
@@ -546,5 +633,222 @@ body.thai-lang .main-menu__call-number,
 body.thai-lang .main-menu__top-text,
 body.thai-lang .main-menu__call-sub-title {
     font-size: 0.95em;
+}
+
+/* Contact Popup Sidebar */
+.contact-popup-sidebar {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100vh;
+    z-index: 9999;
+    transition: right 0.4s ease;
+}
+
+.contact-popup-sidebar.active {
+    right: 0;
+}
+
+.contact-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s ease;
+    z-index: -1;
+}
+
+.contact-popup-sidebar.active .contact-popup-overlay {
+    opacity: 1;
+    visibility: visible;
+}
+
+.contact-popup-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    z-index: 1;
+}
+
+.contact-popup-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: var(--tanspot-base);
+    color: #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.contact-popup-close:hover {
+    background: var(--tanspot-black);
+    transform: rotate(90deg);
+}
+
+.contact-popup-header {
+    padding: 40px 30px 20px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.contact-popup-header h3 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--tanspot-black);
+    margin-bottom: 10px;
+}
+
+.contact-popup-header p {
+    color: #666;
+    margin: 0;
+}
+
+.contact-popup-body {
+    padding: 30px;
+}
+
+.contact-info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 30px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.contact-info-item:last-of-type {
+    border-bottom: none;
+}
+
+.contact-info-item .icon {
+    width: 50px;
+    height: 50px;
+    background: var(--tanspot-base);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 20px;
+}
+
+.contact-info-item .content h5 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--tanspot-black);
+    margin-bottom: 8px;
+}
+
+.contact-info-item .content p {
+    margin: 0;
+    color: #666;
+    line-height: 1.6;
+}
+
+.contact-info-item .content a {
+    color: #666;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.contact-info-item .content a:hover {
+    color: var(--tanspot-base);
+}
+
+.contact-social {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.contact-social h5 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--tanspot-black);
+    margin-bottom: 15px;
+}
+
+.contact-social .social-links {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.contact-social .social-links a {
+    width: 40px;
+    height: 40px;
+    background: #f5f5f5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.contact-social .social-links a:hover {
+    background: var(--tanspot-base);
+    transform: translateY(-3px);
+}
+
+.contact-social .social-links a img {
+    filter: grayscale(100%);
+    transition: filter 0.3s ease;
+}
+
+.contact-social .social-links a:hover img {
+    filter: grayscale(0%) brightness(0) invert(1);
+}
+
+/* Mobile Navigation Integration */
+@media (max-width: 991px) {
+    .contact-popup-sidebar {
+        width: 100%;
+        right: -100%;
+    }
+    
+    .contact-popup-content {
+        width: 320px;
+        margin-left: auto;
+    }
+}
+
+@media (max-width: 575px) {
+    .contact-popup-content {
+        width: 280px;
+    }
+    
+    .contact-popup-header {
+        padding: 30px 20px 15px;
+    }
+    
+    .contact-popup-header h3 {
+        font-size: 24px;
+    }
+    
+    .contact-popup-body {
+        padding: 20px;
+    }
+    
+    .contact-info-item .icon {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
 }
 </style>

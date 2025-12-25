@@ -20,22 +20,22 @@
                             <ul class="account-menu">
                                 <li :class="{ 'active': activeTab === 'profile' }">
                                     <a href="#" @click.prevent="activeTab = 'profile'">
-                                        <i class="fas fa-user"></i> Profile Information
+                                        <i class="fas fa-user"></i> {{ t.profileInfo }}
                                     </a>
                                 </li>
                                 <li :class="{ 'active': activeTab === 'orders' }">
                                     <a href="#" @click.prevent="activeTab = 'orders'">
-                                        <i class="fas fa-box"></i> My Orders
+                                        <i class="fas fa-box"></i> {{ t.myOrders }}
                                     </a>
                                 </li>
                                 <li :class="{ 'active': activeTab === 'password' }">
                                     <a href="#" @click.prevent="activeTab = 'password'">
-                                        <i class="fas fa-lock"></i> Change Password
+                                        <i class="fas fa-lock"></i> {{ t.changePassword }}
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#" @click.prevent="handleLogout">
-                                        <i class="fas fa-sign-out-alt"></i> Logout
+                                        <i class="fas fa-sign-out-alt"></i> {{ t.logout }}
                                     </a>
                                 </li>
                             </ul>
@@ -46,30 +46,30 @@
                     <div class="col-lg-8">
                         <!-- Profile Tab -->
                         <div v-if="activeTab === 'profile'" class="account-content-box">
-                            <h3>Profile Information</h3>
+                            <h3>{{ t.profileInfo }}</h3>
                             <form @submit.prevent="updateProfile">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>First Name</label>
+                                            <label>{{ t.firstName.replace('...', '') }}</label>
                                             <input type="text" v-model="profileData.first_name" class="form-control" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Last Name</label>
+                                            <label>{{ t.lastName.replace('...', '') }}</label>
                                             <input type="text" v-model="profileData.last_name" class="form-control" required>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label>Email</label>
+                                            <label>{{ t.email.replace('...', '') }}</label>
                                             <input type="email" v-model="profileData.email" class="form-control" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
                                         <button type="submit" class="thm-btn" :disabled="isUpdating">
-                                            {{ isUpdating ? 'Updating...' : 'Update Profile' }}
+                                            {{ isUpdating ? t.updating : t.updateProfile }}
                                             <span><i class="icon-right-arrow"></i></span>
                                         </button>
                                     </div>
@@ -79,46 +79,46 @@
                         
                         <!-- Orders Tab -->
                         <div v-if="activeTab === 'orders'" class="account-content-box">
-                            <h3>My Orders</h3>
+                            <h3>{{ t.myOrders }}</h3>
                             <div v-if="orders.length === 0" class="empty-state">
                                 <i class="fas fa-box-open" style="font-size: 60px; color: #ccc;"></i>
-                                <p>No orders yet</p>
+                                <p>{{ t.noOrders }}</p>
                             </div>
                             <div v-else class="orders-list">
                                 <div v-for="order in orders" :key="order.id" class="order-item">
-                                    <h4>Order #{{ order.id }}</h4>
-                                    <p>Date: {{ new Date(order.date_created).toLocaleDateString() }}</p>
-                                    <p>Status: <span class="badge">{{ order.status }}</span></p>
+                                    <h4>{{ t.orderNumber }} #{{ order.id }}</h4>
+                                    <p>{{ t.orderDate }}: {{ new Date(order.date_created).toLocaleDateString() }}</p>
+                                    <p>{{ t.orderStatus }}: <span class="badge">{{ order.status }}</span></p>
                                 </div>
                             </div>
                         </div>
                         
                         <!-- Password Tab -->
                         <div v-if="activeTab === 'password'" class="account-content-box">
-                            <h3>Change Password</h3>
+                            <h3>{{ t.changePassword }}</h3>
                             <form @submit.prevent="updatePassword">
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label>Current Password</label>
+                                            <label>{{ t.currentPassword }}</label>
                                             <input type="password" v-model="passwordData.current" class="form-control" required>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label>New Password</label>
+                                            <label>{{ t.newPassword }}</label>
                                             <input type="password" v-model="passwordData.new" class="form-control" required>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label>Confirm New Password</label>
+                                            <label>{{ t.confirmNewPassword }}</label>
                                             <input type="password" v-model="passwordData.confirm" class="form-control" required>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
                                         <button type="submit" class="thm-btn" :disabled="isUpdating">
-                                            {{ isUpdating ? 'Updating...' : 'Update Password' }}
+                                            {{ isUpdating ? t.updating : t.updatePassword }}
                                             <span><i class="icon-right-arrow"></i></span>
                                         </button>
                                     </div>
@@ -135,15 +135,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuth } from '@/composables/useAuth';
+import { useLanguage } from '@/composables/useLanguage';
+import { useAuthTranslation } from '@/locales/auth';
 import Swal from 'sweetalert2';
 import Header from '../layouts/Header.vue';
 import Footer from '../layouts/Footer.vue';
 
 const router = useRouter();
 const { user, logout } = useAuth();
+const { currentLanguage } = useLanguage();
+const t = computed(() => useAuthTranslation(currentLanguage.value));
 
 const activeTab = ref('profile');
 const isUpdating = ref(false);
@@ -179,14 +183,14 @@ const updateProfile = async () => {
         await new Promise(resolve => setTimeout(resolve, 1000)); // Simulated delay
         
         Swal.fire({
-            title: 'Success!',
-            text: 'Profile updated successfully',
+            title: t.value.success,
+            text: t.value.profileUpdated,
             icon: 'success',
             confirmButtonColor: '#e03e2d'
         });
     } catch (error) {
         Swal.fire({
-            title: 'Error!',
+            title: t.value.error,
             text: 'Failed to update profile',
             icon: 'error',
             confirmButtonColor: '#e03e2d'
@@ -199,8 +203,8 @@ const updateProfile = async () => {
 const updatePassword = async () => {
     if (passwordData.value.new !== passwordData.value.confirm) {
         Swal.fire({
-            title: 'Error!',
-            text: 'New passwords do not match',
+            title: t.value.error,
+            text: t.value.newPasswordMismatch,
             icon: 'error',
             confirmButtonColor: '#e03e2d'
         });
@@ -216,14 +220,14 @@ const updatePassword = async () => {
         passwordData.value = { current: '', new: '', confirm: '' };
         
         Swal.fire({
-            title: 'Success!',
-            text: 'Password updated successfully',
+            title: t.value.success,
+            text: t.value.passwordUpdated,
             icon: 'success',
             confirmButtonColor: '#e03e2d'
         });
     } catch (error) {
         Swal.fire({
-            title: 'Error!',
+            title: t.value.error,
             text: 'Failed to update password',
             icon: 'error',
             confirmButtonColor: '#e03e2d'
@@ -235,13 +239,14 @@ const updatePassword = async () => {
 
 const handleLogout = async () => {
     const result = await Swal.fire({
-        title: 'Logout',
-        text: 'Are you sure you want to logout?',
+        title: t.value.logout,
+        text: t.value.logoutConfirm,
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#e03e2d',
         cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Yes, logout'
+        confirmButtonText: t.value.yes,
+        cancelButtonText: t.value.cancel
     });
 
     if (result.isConfirmed) {

@@ -7,7 +7,7 @@
             <div class="container">
                 <div class="login-one__form">
                     <div class="inner-title text-center">
-                        <h3>{{ isLoginMode ? 'Login Here' : 'Sign Up' }}</h3>
+                        <h3>{{ isLoginMode ? t.loginTitle : t.signUpTitle }}</h3>
                     </div>
                     <form id="login-one__form" name="Login-one_form" @submit.prevent="handleSubmit">
                         <div class="row">
@@ -15,7 +15,7 @@
                             <div v-if="!isLoginMode" class="col-xl-12">
                                 <div class="form-group">
                                     <div class="input-box">
-                                        <input type="text" v-model="formData.firstName" placeholder="First Name..." required>
+                                        <input type="text" v-model="formData.firstName" :placeholder="t.firstName" required>
                                     </div>
                                 </div>
                             </div>
@@ -23,7 +23,7 @@
                             <div v-if="!isLoginMode" class="col-xl-12">
                                 <div class="form-group">
                                     <div class="input-box">
-                                        <input type="text" v-model="formData.lastName" placeholder="Last Name..." required>
+                                        <input type="text" v-model="formData.lastName" :placeholder="t.lastName" required>
                                     </div>
                                 </div>
                             </div>
@@ -31,7 +31,7 @@
                             <div class="col-xl-12">
                                 <div class="form-group">
                                     <div class="input-box">
-                                        <input type="email" v-model="formData.email" id="formEmail" placeholder="Email..."
+                                        <input type="email" v-model="formData.email" id="formEmail" :placeholder="t.email"
                                             required>
                                     </div>
                                 </div>
@@ -40,7 +40,7 @@
                                 <div class="form-group">
                                     <div class="input-box">
                                         <input type="password" v-model="formData.password" id="formPassword"
-                                            placeholder="Password..." required>
+                                            :placeholder="t.password" required>
                                     </div>
                                 </div>
                             </div>
@@ -49,15 +49,15 @@
                             <div v-if="!isLoginMode" class="col-xl-12">
                                 <div class="form-group">
                                     <div class="input-box">
-                                        <input type="password" v-model="formData.confirmPassword" placeholder="Confirm Password..." required>
+                                        <input type="password" v-model="formData.confirmPassword" :placeholder="t.confirmPassword" required>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="col-xl-12">
                                 <div class="form-group">
-                                    <button class="thm-btn" type="submit" :disabled="isSubmitting" :data-loading-text="isSubmitting ? 'Please wait...' : ''">
-                                        {{ isSubmitting ? 'Please wait...' : (isLoginMode ? 'Login Here' : 'Sign UP') }}
+                                    <button class="thm-btn" type="submit" :disabled="isSubmitting" :data-loading-text="isSubmitting ? t.pleaseWait : ''">
+                                        {{ isSubmitting ? t.pleaseWait : (isLoginMode ? t.loginButton : t.signUpButton) }}
                                         <span><i class="icon-right-arrow"></i></span>
                                     </button>
                                 </div>
@@ -67,17 +67,17 @@
                                     <input type="checkbox" v-model="rememberMe" id="saveinfo">
                                     <label for="saveinfo">
                                         <span></span>
-                                        Remember me
+                                        {{ t.rememberMe }}
                                     </label>
                                 </div>
                                 <div class="forget">
-                                    <a href="#" @click.prevent="showForgotPassword">Forget password?</a>
+                                    <a href="#" @click.prevent="showForgotPassword">{{ t.forgetPassword }}</a>
                                 </div>
                             </div>
 
                             <div class="create-account text-center">
-                                <p v-if="isLoginMode">Not registered yet? <a href="#" @click.prevent="toggleMode">Create an Account</a></p>
-                                <p v-else>Already have an account? <a href="#" @click.prevent="toggleMode">Login Here</a></p>
+                                <p v-if="isLoginMode">{{ t.notRegistered }} <a href="#" @click.prevent="toggleMode">{{ t.createAccount }}</a></p>
+                                <p v-else>{{ t.alreadyHaveAccount }} <a href="#" @click.prevent="toggleMode">{{ t.loginHere }}</a></p>
                             </div>
                         </div>
                     </form>
@@ -90,14 +90,18 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuth } from '@/composables/useAuth';
+import { useLanguage } from '@/composables/useLanguage';
+import { useAuthTranslation } from '@/locales/auth';
 import Swal from 'sweetalert2';
 import Header from '../../layouts/Header.vue';
 import Footer from '../../layouts/Footer.vue';
 
 const router = useRouter();
+const { currentLanguage } = useLanguage();
+const t = computed(() => useAuthTranslation(currentLanguage.value));
 const { login, register, requestPasswordReset } = useAuth();
 
 const isLoginMode = ref(true);
@@ -134,7 +138,7 @@ const handleSubmit = async () => {
 
     // Validate passwords match for registration
     if (!isLoginMode.value && formData.value.password !== formData.value.confirmPassword) {
-        errorMessage.value = 'Passwords do not match';
+        errorMessage.value = t.value.passwordMismatch;
         return;
     }
 
@@ -151,8 +155,8 @@ const handleSubmit = async () => {
 
         if (result.success) {
             Swal.fire({
-                title: 'Success!',
-                text: isLoginMode.value ? 'Logged in successfully!' : 'Registration successful!',
+                title: t.value.success,
+                text: isLoginMode.value ? t.value.loginSuccess : t.value.registerSuccess,
                 icon: 'success',
                 confirmButtonText: 'OK',
                 confirmButtonColor: '#e03e2d'
