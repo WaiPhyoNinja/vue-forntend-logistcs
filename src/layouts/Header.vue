@@ -313,7 +313,7 @@ onMounted(async () => {
                                 </a>
                             </div>
                             <div class="main-menu__btn-box">
-                                <a href="#" class="thm-btn">Track Order<span><i
+                                <a href="#" @click.prevent="router.push('/request-quote')" class="thm-btn">Request Quote<span><i
                                             class="icon-right-arrow"></i></span></a>
                             </div>
                         </div>
@@ -395,7 +395,7 @@ onMounted(async () => {
                                 </a>
                             </div>
                             <div class="main-menu__btn-box">
-                                <a href="contact.php" class="thm-btn">Track Order<span><i
+                                <a href="#" @click.prevent="router.push('/request-quote')" class="thm-btn">Request Quote<span><i
                                             class="icon-right-arrow"></i></span></a>
                             </div>
                         </div>
