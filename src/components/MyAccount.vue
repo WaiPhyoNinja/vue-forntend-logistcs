@@ -80,7 +80,7 @@
                     <!-- Orders Tab -->
                     <div v-if="activeTab === 'orders'" class="account-content-box">
                         <h3>{{ t.myRequestQuote }}</h3>                            <!-- Quote Requests Section -->
-                            <div class="quote-requests-section">
+                            <div class="quote-requests-section" style="margin-bottom: 40px;">
                                 <h4 style="margin-top: 0; margin-bottom: 20px; color: #e03e2d;">
                                     <i class="fas fa-file-invoice"></i> Quote Requests
                                 </h4>
@@ -165,7 +165,7 @@
                             </div>
                             
                             <!-- Regular Orders Section -->
-                            <div class="orders-section" style="margin-top: 40px;">
+                            <!-- <div class="orders-section" style="margin-top: 40px;">
                                 <h4 style="margin-bottom: 20px; color: #e03e2d;">
                                     <i class="fas fa-box"></i> Orders
                                 </h4>
@@ -181,7 +181,7 @@
                                         <p>{{ t.orderStatus }}: <span class="badge">{{ order.status }}</span></p>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                         
                         <!-- Password Tab -->
