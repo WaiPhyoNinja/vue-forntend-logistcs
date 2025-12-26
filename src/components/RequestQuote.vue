@@ -8,8 +8,8 @@
                     <div class="col-xl-8 col-lg-7">
                         <div class="quote-details">
                             <div class="quote-title">
-                                <h2>Request a Quote</h2>
-                                <p>Fill in the details below to get an instant shipping quote</p>
+                                <h2>{{ t.pageTitle }}</h2>
+                                <p>{{ t.pageSubtitle }}</p>
                             </div>
 
                             <!-- Step Progress Indicator -->
@@ -36,22 +36,22 @@
                                 <!-- Step 1: Sender Information -->
                                 <div class="form-section" v-show="currentStep === 1">
                                     <div class="section-header">
-                                        <h3><i class="fas fa-user-circle"></i> Sender Information</h3>
+                                        <h3><i class="fas fa-user-circle"></i> {{ t.senderTitle }}</h3>
                                     </div>
 
                                     <div class="row bs-gutter-x-20">
                                         <div class="col-xl-6">
                                             <div class="billing_input_box">
-                                                <label>First Name *</label>
+                                                <label>{{ t.firstName }} {{ t.required }}</label>
                                                 <input type="text" v-model="formData.sender.firstName"
-                                                    placeholder="Enter first name" required />
+                                                    :placeholder="t.enterFirstName" required />
                                             </div>
                                         </div>
                                         <div class="col-xl-6">
                                             <div class="billing_input_box">
-                                                <label>Last Name *</label>
+                                                <label>{{ t.lastName }} {{ t.required }}</label>
                                                 <input type="text" v-model="formData.sender.lastName"
-                                                    placeholder="Enter last name" required />
+                                                    :placeholder="t.enterLastName" required />
                                             </div>
                                         </div>
                                     </div>
@@ -59,9 +59,9 @@
                                     <div class="row">
                                         <div class="col-xl-12">
                                             <div class="billing_input_box">
-                                                <label>Company Name</label>
+                                                <label>{{ t.companyName }}</label>
                                                 <input type="text" v-model="formData.sender.company"
-                                                    placeholder="Enter company name (optional)" />
+                                                    :placeholder="t.enterCompany" />
                                             </div>
                                         </div>
                                     </div>
@@ -69,16 +69,16 @@
                                     <div class="row bs-gutter-x-20">
                                         <div class="col-xl-6">
                                             <div class="billing_input_box">
-                                                <label>Email Address *</label>
+                                                <label>{{ t.email }} {{ t.required }}</label>
                                                 <input type="email" v-model="formData.sender.email"
-                                                    placeholder="example@email.com" required />
+                                                    :placeholder="t.enterEmail" required />
                                             </div>
                                         </div>
                                         <div class="col-xl-6">
                                             <div class="billing_input_box">
-                                                <label>Phone Number *</label>
+                                                <label>{{ t.phone }} {{ t.required }}</label>
                                                 <input type="tel" v-model="formData.sender.phone"
-                                                    placeholder="+95 XXX XXX XXXX" required />
+                                                    :placeholder="t.enterPhone" required />
                                             </div>
                                         </div>
                                     </div>
@@ -86,9 +86,9 @@
                                     <div class="row">
                                         <div class="col-xl-12">
                                             <div class="billing_input_box">
-                                                <label>Pickup Address *</label>
+                                                <label>{{ t.pickupAddress }} {{ t.required }}</label>
                                                 <input type="text" v-model="formData.sender.address"
-                                                    placeholder="Street address" required />
+                                                    :placeholder="t.streetAddress" required />
                                             </div>
                                         </div>
                                     </div>
@@ -96,16 +96,16 @@
                                     <div class="row bs-gutter-x-20">
                                         <div class="col-xl-6">
                                             <div class="billing_input_box">
-                                                <label>City *</label>
+                                                <label>{{ t.city }} {{ t.required }}</label>
                                                 <input type="text" v-model="formData.sender.city"
-                                                    placeholder="Enter city" required />
+                                                    :placeholder="t.enterCity" required />
                                             </div>
                                         </div>
                                         <div class="col-xl-6">
                                             <div class="billing_input_box">
-                                                <label>State/Region *</label>
+                                                <label>{{ t.state }} {{ t.required }}</label>
                                                 <input type="text" v-model="formData.sender.state"
-                                                    placeholder="Enter state/region" required />
+                                                    :placeholder="t.enterState" required />
                                             </div>
                                         </div>
                                     </div>
@@ -113,22 +113,22 @@
                                     <div class="row bs-gutter-x-20">
                                         <div class="col-xl-6">
                                             <div class="billing_input_box">
-                                                <label>Country *</label>
+                                                <label>{{ t.country }} {{ t.required }}</label>
                                                 <select v-model="formData.sender.country" class="form-select" required>
-                                                    <option value="">Select a country</option>
-                                                    <option value="myanmar">Myanmar</option>
-                                                    <option value="thailand">Thailand</option>
-                                                    <option value="singapore">Singapore</option>
-                                                    <option value="malaysia">Malaysia</option>
-                                                    <option value="vietnam">Vietnam</option>
+                                                    <option value="">{{ t.selectCountry }}</option>
+                                                    <option value="myanmar">{{ t.myanmar }}</option>
+                                                    <option value="thailand">{{ t.thailand }}</option>
+                                                    <option value="singapore">{{ t.singapore }}</option>
+                                                    <option value="malaysia">{{ t.malaysia }}</option>
+                                                    <option value="vietnam">{{ t.vietnam }}</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="col-xl-6">
                                             <div class="billing_input_box">
-                                                <label>Postal Code</label>
+                                                <label>{{ t.postalCode }}</label>
                                                 <input type="text" v-model="formData.sender.postalCode"
-                                                    placeholder="Enter postal code" />
+                                                    :placeholder="t.enterPostal" />
                                             </div>
                                         </div>
                                     </div>
@@ -137,22 +137,22 @@
                                 <!-- Step 2: Receiver Information -->
                                 <div class="form-section" v-show="currentStep === 2">
                                     <div class="section-header">
-                                        <h3><i class="fas fa-map-marker-alt"></i> Receiver Information</h3>
+                                        <h3><i class="fas fa-map-marker-alt"></i> {{ t.receiverTitle }}</h3>
                                     </div>
 
                                     <div class="row bs-gutter-x-20">
                                         <div class="col-xl-6">
                                             <div class="billing_input_box">
-                                                <label>First Name *</label>
+                                                <label>{{ t.firstName }} {{ t.required }}</label>
                                                 <input type="text" v-model="formData.receiver.firstName"
-                                                    placeholder="Enter first name" required />
+                                                    :placeholder="t.enterFirstName" required />
                                             </div>
                                         </div>
                                         <div class="col-xl-6">
                                             <div class="billing_input_box">
-                                                <label>Last Name *</label>
+                                                <label>{{ t.lastName }} {{ t.required }}</label>
                                                 <input type="text" v-model="formData.receiver.lastName"
-                                                    placeholder="Enter last name" required />
+                                                    :placeholder="t.enterLastName" required />
                                             </div>
                                         </div>
                                     </div>
@@ -160,9 +160,9 @@
                                     <div class="row">
                                         <div class="col-xl-12">
                                             <div class="billing_input_box">
-                                                <label>Company Name</label>
+                                                <label>{{ t.companyName }}</label>
                                                 <input type="text" v-model="formData.receiver.company"
-                                                    placeholder="Enter company name (optional)" />
+                                                    :placeholder="t.enterCompany" />
                                             </div>
                                         </div>
                                     </div>
@@ -170,16 +170,16 @@
                                     <div class="row bs-gutter-x-20">
                                         <div class="col-xl-6">
                                             <div class="billing_input_box">
-                                                <label>Email Address *</label>
+                                                <label>{{ t.email }} {{ t.required }}</label>
                                                 <input type="email" v-model="formData.receiver.email"
-                                                    placeholder="example@email.com" required />
+                                                    :placeholder="t.enterEmail" required />
                                             </div>
                                         </div>
                                         <div class="col-xl-6">
                                             <div class="billing_input_box">
-                                                <label>Phone Number *</label>
+                                                <label>{{ t.phone }} {{ t.required }}</label>
                                                 <input type="tel" v-model="formData.receiver.phone"
-                                                    placeholder="+95 XXX XXX XXXX" required />
+                                                    :placeholder="t.enterPhone" required />
                                             </div>
                                         </div>
                                     </div>
@@ -187,9 +187,9 @@
                                     <div class="row">
                                         <div class="col-xl-12">
                                             <div class="billing_input_box">
-                                                <label>Delivery Address *</label>
+                                                <label>{{ t.deliveryAddress }} {{ t.required }}</label>
                                                 <input type="text" v-model="formData.receiver.address"
-                                                    placeholder="Street address" required />
+                                                    :placeholder="t.streetAddress" required />
                                             </div>
                                         </div>
                                     </div>
@@ -197,16 +197,16 @@
                                     <div class="row bs-gutter-x-20">
                                         <div class="col-xl-6">
                                             <div class="billing_input_box">
-                                                <label>City *</label>
+                                                <label>{{ t.city }} {{ t.required }}</label>
                                                 <input type="text" v-model="formData.receiver.city"
-                                                    placeholder="Enter city" required />
+                                                    :placeholder="t.enterCity" required />
                                             </div>
                                         </div>
                                         <div class="col-xl-6">
                                             <div class="billing_input_box">
-                                                <label>State/Region *</label>
+                                                <label>{{ t.state }} {{ t.required }}</label>
                                                 <input type="text" v-model="formData.receiver.state"
-                                                    placeholder="Enter state/region" required />
+                                                    :placeholder="t.enterState" required />
                                             </div>
                                         </div>
                                     </div>
@@ -214,23 +214,23 @@
                                     <div class="row bs-gutter-x-20">
                                         <div class="col-xl-6">
                                             <div class="billing_input_box">
-                                                <label>Country *</label>
+                                                <label>{{ t.country }} {{ t.required }}</label>
                                                 <select v-model="formData.receiver.country" class="form-select"
                                                     required>
-                                                    <option value="">Select a country</option>
-                                                    <option value="myanmar">Myanmar</option>
-                                                    <option value="thailand">Thailand</option>
-                                                    <option value="singapore">Singapore</option>
-                                                    <option value="malaysia">Malaysia</option>
-                                                    <option value="vietnam">Vietnam</option>
+                                                    <option value="">{{ t.selectCountry }}</option>
+                                                    <option value="myanmar">{{ t.myanmar }}</option>
+                                                    <option value="thailand">{{ t.thailand }}</option>
+                                                    <option value="singapore">{{ t.singapore }}</option>
+                                                    <option value="malaysia">{{ t.malaysia }}</option>
+                                                    <option value="vietnam">{{ t.vietnam }}</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="col-xl-6">
                                             <div class="billing_input_box">
-                                                <label>Postal Code</label>
+                                                <label>{{ t.postalCode }}</label>
                                                 <input type="text" v-model="formData.receiver.postalCode"
-                                                    placeholder="Enter postal code" />
+                                                    :placeholder="t.enterPostal" />
                                             </div>
                                         </div>
                                     </div>
@@ -239,32 +239,32 @@
                                 <!-- Step 3: Shipment Details -->
                                 <div class="form-section" v-show="currentStep === 3">
                                     <div class="section-header">
-                                        <h3><i class="fas fa-box"></i> Shipment Details</h3>
+                                        <h3><i class="fas fa-box"></i> {{ t.shipmentTitle }}</h3>
                                     </div>
 
                                     <div class="row bs-gutter-x-20">
                                         <div class="col-xl-6">
                                             <div class="billing_input_box">
-                                                <label>Shipment Type *</label>
+                                                <label>{{ t.shipmentType }} {{ t.required }}</label>
                                                 <select v-model="formData.shipment.type" class="form-select" required>
-                                                    <option value="">Select shipment type</option>
-                                                    <option value="document">Document</option>
-                                                    <option value="parcel">Parcel</option>
-                                                    <option value="freight">Freight</option>
-                                                    <option value="express">Express</option>
+                                                    <option value="">{{ t.selectShipmentType }}</option>
+                                                    <option value="document">{{ t.document }}</option>
+                                                    <option value="parcel">{{ t.parcel }}</option>
+                                                    <option value="freight">{{ t.freight }}</option>
+                                                    <option value="express">{{ t.express }}</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="col-xl-6">
                                             <div class="billing_input_box">
-                                                <label>Service Type *</label>
+                                                <label>{{ t.serviceType }} {{ t.required }}</label>
                                                 <select v-model="formData.shipment.service" class="form-select"
                                                     required>
-                                                    <option value="">Select service type</option>
-                                                    <option value="standard">Standard Delivery</option>
-                                                    <option value="express">Express Delivery</option>
-                                                    <option value="overnight">Overnight</option>
-                                                    <option value="economy">Economy</option>
+                                                    <option value="">{{ t.selectServiceType }}</option>
+                                                    <option value="standard">{{ t.standardDelivery }}</option>
+                                                    <option value="express">{{ t.expressDelivery }}</option>
+                                                    <option value="overnight">{{ t.overnight }}</option>
+                                                    <option value="economy">{{ t.economy }}</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -273,21 +273,21 @@
                                     <div class="row bs-gutter-x-20">
                                         <div class="col-xl-4">
                                             <div class="billing_input_box">
-                                                <label>Weight (kg) *</label>
+                                                <label>{{ t.weight }} {{ t.required }}</label>
                                                 <input type="number" v-model="formData.shipment.weight"
                                                     placeholder="0.00" step="0.01" min="0" required />
                                             </div>
                                         </div>
                                         <div class="col-xl-4">
                                             <div class="billing_input_box">
-                                                <label>Length (cm)</label>
+                                                <label>{{ t.length }}</label>
                                                 <input type="number" v-model="formData.shipment.length" placeholder="0"
                                                     min="0" />
                                             </div>
                                         </div>
                                         <div class="col-xl-4">
                                             <div class="billing_input_box">
-                                                <label>Width (cm)</label>
+                                                <label>{{ t.width }}</label>
                                                 <input type="number" v-model="formData.shipment.width" placeholder="0"
                                                     min="0" />
                                             </div>
@@ -297,21 +297,21 @@
                                     <div class="row bs-gutter-x-20">
                                         <div class="col-xl-4">
                                             <div class="billing_input_box">
-                                                <label>Height (cm)</label>
+                                                <label>{{ t.height }}</label>
                                                 <input type="number" v-model="formData.shipment.height" placeholder="0"
                                                     min="0" />
                                             </div>
                                         </div>
                                         <div class="col-xl-4">
                                             <div class="billing_input_box">
-                                                <label>Quantity *</label>
+                                                <label>{{ t.quantity }} {{ t.required }}</label>
                                                 <input type="number" v-model="formData.shipment.quantity"
                                                     placeholder="1" min="1" required />
                                             </div>
                                         </div>
                                         <div class="col-xl-4">
                                             <div class="billing_input_box">
-                                                <label>Declared Value ($)</label>
+                                                <label>{{ t.declaredValue }}</label>
                                                 <input type="number" v-model="formData.shipment.declaredValue"
                                                     placeholder="0.00" step="0.01" min="0" />
                                             </div>
@@ -321,9 +321,9 @@
                                     <div class="row">
                                         <div class="col-xl-12">
                                             <div class="billing_input_box">
-                                                <label>Package Description *</label>
+                                                <label>{{ t.packageDescription }} {{ t.required }}</label>
                                                 <textarea v-model="formData.shipment.description"
-                                                    placeholder="Describe the contents of your shipment" rows="3"
+                                                    :placeholder="t.describePackage" rows="3"
                                                     required></textarea>
                                             </div>
                                         </div>
@@ -332,9 +332,9 @@
                                     <div class="row">
                                         <div class="col-xl-12">
                                             <div class="billing_input_box">
-                                                <label>Special Instructions</label>
+                                                <label>{{ t.specialInstructions }}</label>
                                                 <textarea v-model="formData.shipment.specialInstructions"
-                                                    placeholder="Any special handling requirements (optional)"
+                                                    :placeholder="t.specialHandling"
                                                     rows="3"></textarea>
                                             </div>
                                         </div>
@@ -346,7 +346,7 @@
                                                 <input type="checkbox" v-model="formData.shipment.insurance"
                                                     id="insurance" />
                                                 <label for="insurance">
-                                                    <span></span>Add insurance coverage
+                                                    <span></span>{{ t.insurance }}
                                                 </label>
                                             </div>
                                         </div>
@@ -364,7 +364,7 @@
                                                 class="thm-btn btn-outline"
                                             >
                                                 <span><i class="fas fa-arrow-left"></i></span>
-                                                Previous
+                                                {{ t.previous }}
                                             </button>
                                             <button 
                                                 v-if="currentStep < 3" 
@@ -372,7 +372,7 @@
                                                 @click="nextStep" 
                                                 class="thm-btn"
                                             >
-                                                Next Step
+                                                {{ t.nextStep }}
                                                 <span><i class="fas fa-arrow-right"></i></span>
                                             </button>
                                             <button 
@@ -383,7 +383,7 @@
                                                 :disabled="isSubmitting"
                                             >
                                                 <span v-if="!isAuthenticated"><i class="fas fa-lock"></i></span>
-                                                {{ isSubmitting ? 'Submitting...' : (isAuthenticated ? 'Submit Quote Request' : 'Login to Submit') }}
+                                                {{ isSubmitting ? t.submitting : (isAuthenticated ? t.submitQuote : t.loginToSubmit) }}
                                                 <span><i class="icon-right-arrow"></i></span>
                                             </button>
                                         </div>
@@ -397,7 +397,7 @@
                     <div class="col-xl-4 col-lg-5">
                         <div class="sidebar-quote-summary">
                             <div class="title-box">
-                                <h3>Quote Summary</h3>
+                                <h3>{{ t.summaryTitle }}</h3>
                             </div>
 
                             <div class="quote-route">
@@ -406,8 +406,8 @@
                                         <i class="fas fa-map-marker-alt"></i>
                                     </div>
                                     <div class="content">
-                                        <p class="label">From</p>
-                                        <p class="value">{{ senderLocation || 'Not specified' }}</p>
+                                        <p class="label">{{ t.from }}</p>
+                                        <p class="value">{{ senderLocation || t.notSpecified }}</p>
                                     </div>
                                 </div>
 
@@ -420,8 +420,8 @@
                                         <i class="fas fa-map-pin"></i>
                                     </div>
                                     <div class="content">
-                                        <p class="label">To</p>
-                                        <p class="value">{{ receiverLocation || 'Not specified' }}</p>
+                                        <p class="label">{{ t.to }}</p>
+                                        <p class="value">{{ receiverLocation || t.notSpecified }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -429,7 +429,7 @@
                             <ul class="sidebar-quote-summary__list list-unstyled">
                                 <li>
                                     <div class="left-text">
-                                        <p><i class="fas fa-box"></i> Shipment Type</p>
+                                        <p><i class="fas fa-box"></i> {{ t.shipmentTypeLabel }}</p>
                                     </div>
                                     <div class="right-text">
                                         <p>{{ formData.shipment.type || '-' }}</p>
@@ -438,7 +438,7 @@
 
                                 <li>
                                     <div class="left-text">
-                                        <p><i class="fas fa-shipping-fast"></i> Service</p>
+                                        <p><i class="fas fa-shipping-fast"></i> {{ t.serviceLabel }}</p>
                                     </div>
                                     <div class="right-text">
                                         <p>{{ formData.shipment.service || '-' }}</p>
@@ -447,7 +447,7 @@
 
                                 <li>
                                     <div class="left-text">
-                                        <p><i class="fas fa-weight"></i> Weight</p>
+                                        <p><i class="fas fa-weight"></i> {{ t.weightLabel }}</p>
                                     </div>
                                     <div class="right-text">
                                         <p>{{ formData.shipment.weight || '0' }} kg</p>
@@ -457,7 +457,7 @@
                                 <li
                                     v-if="formData.shipment.length && formData.shipment.width && formData.shipment.height">
                                     <div class="left-text">
-                                        <p><i class="fas fa-ruler-combined"></i> Dimensions</p>
+                                        <p><i class="fas fa-ruler-combined"></i> {{ t.dimensionsLabel }}</p>
                                     </div>
                                     <div class="right-text">
                                         <p>{{ formData.shipment.length }} × {{ formData.shipment.width }} × {{
@@ -467,16 +467,16 @@
 
                                 <li>
                                     <div class="left-text">
-                                        <p><i class="fas fa-boxes"></i> Quantity</p>
+                                        <p><i class="fas fa-boxes"></i> {{ t.quantityLabel }}</p>
                                     </div>
                                     <div class="right-text">
-                                        <p>{{ formData.shipment.quantity || '1' }} package(s)</p>
+                                        <p>{{ formData.shipment.quantity || '1' }} {{ t.packages }}</p>
                                     </div>
                                 </li>
 
                                 <li v-if="formData.shipment.declaredValue">
                                     <div class="left-text">
-                                        <p><i class="fas fa-dollar-sign"></i> Declared Value</p>
+                                        <p><i class="fas fa-dollar-sign"></i> {{ t.declaredValueLabel }}</p>
                                     </div>
                                     <div class="right-text">
                                         <p>${{ parseFloat(formData.shipment.declaredValue).toFixed(2) }}</p>
@@ -485,10 +485,10 @@
 
                                 <li v-if="formData.shipment.insurance">
                                     <div class="left-text">
-                                        <p><i class="fas fa-shield-alt"></i> Insurance</p>
+                                        <p><i class="fas fa-shield-alt"></i> {{ t.insuranceLabel }}</p>
                                     </div>
                                     <div class="right-text">
-                                        <p class="text-success">Included</p>
+                                        <p class="text-success">{{ t.included }}</p>
                                     </div>
                                 </li>
                             </ul>
@@ -499,10 +499,10 @@
                                     <i class="fas fa-lock"></i>
                                 </div>
                                 <div class="warning-content">
-                                    <h5>Login Required</h5>
-                                    <p>You need to be logged in to submit a quote request. Don't worry, your form data will be saved!</p>
+                                    <h5>{{ t.loginRequired }}</h5>
+                                    <p>{{ t.loginRequiredText }}</p>
                                     <button @click="router.push('/login')" class="login-btn">
-                                        <i class="fas fa-sign-in-alt"></i> Login Now
+                                        <i class="fas fa-sign-in-alt"></i> {{ t.loginNow }}
                                     </button>
                                 </div>
                             </div>
@@ -513,26 +513,26 @@
                                     <i class="fas fa-user-check"></i>
                                 </div>
                                 <div class="user-content">
-                                    <h5>Logged In</h5>
+                                    <h5>{{ t.loggedIn }}</h5>
                                     <p>{{ user?.email || 'User' }}</p>
                                 </div>
                             </div>
 
                             <div class="quote-info-box">
-                                <h4><i class="fas fa-info-circle"></i> What Happens Next?</h4>
+                                <h4><i class="fas fa-info-circle"></i> {{ t.whatHappens }}</h4>
                                 <ul>
-                                    <li><i class="fas fa-check"></i> Submit your quote request</li>
-                                    <li><i class="fas fa-check"></i> Our team reviews your details</li>
-                                    <li><i class="fas fa-check"></i> Receive quote within 24 hours</li>
-                                    <li><i class="fas fa-check"></i> Approve and schedule pickup</li>
+                                    <li><i class="fas fa-check"></i> {{ t.step1 }}</li>
+                                    <li><i class="fas fa-check"></i> {{ t.step2 }}</li>
+                                    <li><i class="fas fa-check"></i> {{ t.step3 }}</li>
+                                    <li><i class="fas fa-check"></i> {{ t.step4 }}</li>
                                 </ul>
                             </div>
 
                             <div class="sidebar-quote-summary__bottom">
                                 <p class="text1">
-                                    By submitting this form, you agree to our
-                                    <a href="#">terms and conditions</a> and
-                                    <a href="#">privacy policy</a>.
+                                    {{ t.termsText }}
+                                    <a href="#">{{ t.termsLink }}</a> {{ t.and }}
+                                    <a href="#">{{ t.privacyLink }}</a>.
                                 </p>
                             </div>
                         </div>
@@ -551,18 +551,29 @@ import { useRouter } from 'vue-router'
 import Footer from '../layouts/Footer.vue'
 import Header from '../layouts/Header.vue'
 import { useAuth } from '@/composables/useAuth'
+import { useLanguage } from '@/composables/useLanguage'
+import { quoteTranslations } from '@/locales/quote'
 import Swal from 'sweetalert2'
 
 const router = useRouter()
 const { isAuthenticated, user, checkAuth } = useAuth()
+const { currentLanguage } = useLanguage()
 const isSubmitting = ref(false)
 const currentStep = ref(1)
 
-const steps = [
-    { label: 'Sender Info', icon: 'fa-user-circle' },
-    { label: 'Receiver Info', icon: 'fa-map-marker-alt' },
-    { label: 'Shipment Details', icon: 'fa-box' }
-]
+// Translation helper
+const useQuoteTranslation = (lang) => {
+    return quoteTranslations[lang] || quoteTranslations['en-US']
+}
+
+// Computed translation object
+const t = computed(() => useQuoteTranslation(currentLanguage.value))
+
+const steps = computed(() => [
+    { label: t.value.stepSenderInfo, icon: 'fa-user-circle' },
+    { label: t.value.stepReceiverInfo, icon: 'fa-map-marker-alt' },
+    { label: t.value.stepShipmentDetails, icon: 'fa-box' }
+])
 
 const formData = ref({
     sender: {
@@ -626,14 +637,14 @@ const handleSubmit = async () => {
     
     if (!isAuthenticated.value) {
         const result = await Swal.fire({
-            title: 'Login Required',
-            text: 'You need to login first to submit a quote request. Would you like to login now?',
+            title: t.value.loginTitle,
+            text: t.value.loginText,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#e03e2d',
             cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Yes, Login',
-            cancelButtonText: 'Cancel'
+            confirmButtonText: t.value.yesLogin,
+            cancelButtonText: t.value.cancel
         })
 
         if (result.isConfirmed) {
@@ -658,8 +669,8 @@ const handleSubmit = async () => {
         await new Promise(resolve => setTimeout(resolve, 2000))
 
         await Swal.fire({
-            title: 'Success!',
-            text: 'Quote request submitted successfully! We will contact you within 24 hours.',
+            title: t.value.successTitle,
+            text: t.value.successText,
             icon: 'success',
             confirmButtonColor: '#e03e2d',
             timer: 3000
@@ -674,8 +685,8 @@ const handleSubmit = async () => {
     } catch (error) {
         console.error('Error submitting quote:', error)
         await Swal.fire({
-            title: 'Error!',
-            text: 'An error occurred. Please try again.',
+            title: t.value.errorTitle,
+            text: t.value.errorText,
             icon: 'error',
             confirmButtonColor: '#e03e2d'
         })
@@ -705,13 +716,13 @@ const validateCurrentStep = () => {
     if (currentStep.value === 1) {
         const { firstName, lastName, email, phone, address, city, state, country } = formData.value.sender
         if (!firstName || !lastName || !email || !phone || !address || !city || !state || !country) {
-            alert('Please fill in all required sender information fields.')
+            alert(t.value.fillRequired)
             return false
         }
     } else if (currentStep.value === 2) {
         const { firstName, lastName, email, phone, address, city, state, country } = formData.value.receiver
         if (!firstName || !lastName || !email || !phone || !address || !city || !state || !country) {
-            alert('Please fill in all required receiver information fields.')
+            alert(t.value.fillRequiredReceiver)
             return false
         }
     }
@@ -776,8 +787,8 @@ onMounted(async () => {
             }
             
             await Swal.fire({
-                title: 'Welcome Back!',
-                text: 'Your quote request has been restored. You can now submit it.',
+                title: t.value.welcomeBack,
+                text: t.value.welcomeBackText,
                 icon: 'info',
                 confirmButtonColor: '#e03e2d',
                 timer: 3000
