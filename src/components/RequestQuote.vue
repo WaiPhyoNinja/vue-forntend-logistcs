@@ -553,6 +553,8 @@ import Header from '../layouts/Header.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useLanguage } from '@/composables/useLanguage'
 import { quoteTranslations } from '@/locales/quote'
+import { createItem } from '@directus/sdk'
+import directus from '@/services/directus'
 import Swal from 'sweetalert2'
 
 const router = useRouter()
@@ -661,12 +663,53 @@ const handleSubmit = async () => {
     isSubmitting.value = true
 
     try {
-        // Here you would typically send the data to your API
-        console.log('Quote Request Data:', formData.value)
-        console.log('User:', user.value)
+        // Prepare data for Directus
+        const quoteData = {
+            // Sender information
+            sender_first_name: formData.value.sender.firstName,
+            sender_last_name: formData.value.sender.lastName,
+            sender_company: formData.value.sender.company || null,
+            sender_email: formData.value.sender.email,
+            sender_phone: formData.value.sender.phone,
+            sender_address: formData.value.sender.address,
+            sender_city: formData.value.sender.city,
+            sender_state: formData.value.sender.state,
+            sender_country: formData.value.sender.country,
+            sender_postal_code: formData.value.sender.postalCode || null,
+            
+            // Receiver information
+            receiver_first_name: formData.value.receiver.firstName,
+            receiver_last_name: formData.value.receiver.lastName,
+            receiver_company: formData.value.receiver.company || null,
+            receiver_email: formData.value.receiver.email,
+            receiver_phone: formData.value.receiver.phone,
+            receiver_address: formData.value.receiver.address,
+            receiver_city: formData.value.receiver.city,
+            receiver_state: formData.value.receiver.state,
+            receiver_country: formData.value.receiver.country,
+            receiver_postal_code: formData.value.receiver.postalCode || null,
+            
+            // Shipment information
+            shipment_type: formData.value.shipment.type,
+            service_type: formData.value.shipment.service,
+            weight: parseFloat(formData.value.shipment.weight),
+            length: formData.value.shipment.length ? parseFloat(formData.value.shipment.length) : null,
+            width: formData.value.shipment.width ? parseFloat(formData.value.shipment.width) : null,
+            height: formData.value.shipment.height ? parseFloat(formData.value.shipment.height) : null,
+            quantity: parseInt(formData.value.shipment.quantity),
+            declared_value: formData.value.shipment.declaredValue ? parseFloat(formData.value.shipment.declaredValue) : null,
+            description: formData.value.shipment.description,
+            special_instructions: formData.value.shipment.specialInstructions || null,
+            insurance: formData.value.shipment.insurance,
+            status: 'pending'
+        }
 
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000))
+        console.log('Submitting quote request to Directus:', quoteData)
+
+        // Submit to Directus
+        const result = await directus.request(createItem('quote_requests', quoteData))
+        
+        console.log('Quote request created successfully:', result)
 
         await Swal.fire({
             title: t.value.successTitle,
@@ -684,9 +727,21 @@ const handleSubmit = async () => {
         currentStep.value = 1
     } catch (error) {
         console.error('Error submitting quote:', error)
+        
+        let errorMessage = t.value.errorText
+        
+        // Handle specific error cases
+        if (error.response?.status === 401) {
+            errorMessage = 'Authentication failed. Please log in again.'
+        } else if (error.response?.status === 403) {
+            errorMessage = 'You do not have permission to submit quote requests.'
+        } else if (error.errors) {
+            errorMessage = error.errors.map(e => e.message).join(', ')
+        }
+        
         await Swal.fire({
             title: t.value.errorTitle,
-            text: t.value.errorText,
+            text: errorMessage,
             icon: 'error',
             confirmButtonColor: '#e03e2d'
         })
