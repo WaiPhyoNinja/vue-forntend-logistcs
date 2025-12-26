@@ -25,7 +25,7 @@
                                 </li>
                                 <li :class="{ 'active': activeTab === 'orders' }">
                                     <a href="#" @click.prevent="activeTab = 'orders'">
-                                        <i class="fas fa-box"></i> {{ t.myOrders }}
+                                        <i class="fas fa-file-invoice"></i> {{ t.myRequestQuote }}
                                     </a>
                                 </li>
                                 <li :class="{ 'active': activeTab === 'password' }">
@@ -77,11 +77,9 @@
                             </form>
                         </div>
                         
-                        <!-- Orders Tab -->
-                        <div v-if="activeTab === 'orders'" class="account-content-box">
-                            <h3>{{ t.myOrders }}</h3>
-                            
-                            <!-- Quote Requests Section -->
+                    <!-- Orders Tab -->
+                    <div v-if="activeTab === 'orders'" class="account-content-box">
+                        <h3>{{ t.myRequestQuote }}</h3>                            <!-- Quote Requests Section -->
                             <div class="quote-requests-section">
                                 <h4 style="margin-top: 0; margin-bottom: 20px; color: #e03e2d;">
                                     <i class="fas fa-file-invoice"></i> Quote Requests
