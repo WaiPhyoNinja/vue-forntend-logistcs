@@ -379,9 +379,11 @@
                                                 v-if="currentStep === 3" 
                                                 type="submit" 
                                                 class="thm-btn" 
+                                                :class="{ 'btn-login-required': !isAuthenticated }"
                                                 :disabled="isSubmitting"
                                             >
-                                                {{ isSubmitting ? 'Submitting...' : 'Submit Quote Request' }}
+                                                <span v-if="!isAuthenticated"><i class="fas fa-lock"></i></span>
+                                                {{ isSubmitting ? 'Submitting...' : (isAuthenticated ? 'Submit Quote Request' : 'Login to Submit') }}
                                                 <span><i class="icon-right-arrow"></i></span>
                                             </button>
                                         </div>
@@ -491,6 +493,31 @@
                                 </li>
                             </ul>
 
+                            <!-- Login Warning for Non-Authenticated Users -->
+                            <div v-if="!isAuthenticated" class="quote-login-warning">
+                                <div class="warning-icon">
+                                    <i class="fas fa-lock"></i>
+                                </div>
+                                <div class="warning-content">
+                                    <h5>Login Required</h5>
+                                    <p>You need to be logged in to submit a quote request. Don't worry, your form data will be saved!</p>
+                                    <button @click="router.push('/login')" class="login-btn">
+                                        <i class="fas fa-sign-in-alt"></i> Login Now
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- User Info for Authenticated Users -->
+                            <div v-else class="quote-user-info">
+                                <div class="user-icon">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                                <div class="user-content">
+                                    <h5>Logged In</h5>
+                                    <p>{{ user?.email || 'User' }}</p>
+                                </div>
+                            </div>
+
                             <div class="quote-info-box">
                                 <h4><i class="fas fa-info-circle"></i> What Happens Next?</h4>
                                 <ul>
@@ -519,10 +546,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import Footer from '../layouts/Footer.vue'
 import Header from '../layouts/Header.vue'
+import { useAuth } from '@/composables/useAuth'
+import Swal from 'sweetalert2'
 
+const router = useRouter()
+const { isAuthenticated, user, checkAuth } = useAuth()
 const isSubmitting = ref(false)
 const currentStep = ref(1)
 
@@ -589,21 +621,64 @@ const receiverLocation = computed(() => {
 })
 
 const handleSubmit = async () => {
+    // Check if user is authenticated before submitting
+    await checkAuth()
+    
+    if (!isAuthenticated.value) {
+        const result = await Swal.fire({
+            title: 'Login Required',
+            text: 'You need to login first to submit a quote request. Would you like to login now?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e03e2d',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, Login',
+            cancelButtonText: 'Cancel'
+        })
+
+        if (result.isConfirmed) {
+            // Save form data to sessionStorage before redirecting
+            sessionStorage.setItem('pendingQuoteRequest', JSON.stringify(formData.value))
+            sessionStorage.setItem('quoteRequestStep', currentStep.value.toString())
+            
+            // Redirect to login page
+            router.push('/login')
+        }
+        return
+    }
+
     isSubmitting.value = true
 
     try {
         // Here you would typically send the data to your API
         console.log('Quote Request Data:', formData.value)
+        console.log('User:', user.value)
 
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 2000))
 
-        alert('Quote request submitted successfully! We will contact you within 24 hours.')
+        await Swal.fire({
+            title: 'Success!',
+            text: 'Quote request submitted successfully! We will contact you within 24 hours.',
+            icon: 'success',
+            confirmButtonColor: '#e03e2d',
+            timer: 3000
+        })
+
+        // Clear saved form data
+        sessionStorage.removeItem('pendingQuoteRequest')
+        sessionStorage.removeItem('quoteRequestStep')
+        
         resetForm()
         currentStep.value = 1
     } catch (error) {
         console.error('Error submitting quote:', error)
-        alert('An error occurred. Please try again.')
+        await Swal.fire({
+            title: 'Error!',
+            text: 'An error occurred. Please try again.',
+            icon: 'error',
+            confirmButtonColor: '#e03e2d'
+        })
     } finally {
         isSubmitting.value = false
     }
@@ -685,6 +760,33 @@ const resetForm = () => {
         }
     }
 }
+
+// Restore form data if user returns from login
+onMounted(async () => {
+    await checkAuth()
+    
+    const savedFormData = sessionStorage.getItem('pendingQuoteRequest')
+    const savedStep = sessionStorage.getItem('quoteRequestStep')
+    
+    if (savedFormData && isAuthenticated.value) {
+        try {
+            formData.value = JSON.parse(savedFormData)
+            if (savedStep) {
+                currentStep.value = parseInt(savedStep)
+            }
+            
+            await Swal.fire({
+                title: 'Welcome Back!',
+                text: 'Your quote request has been restored. You can now submit it.',
+                icon: 'info',
+                confirmButtonColor: '#e03e2d',
+                timer: 3000
+            })
+        } catch (error) {
+            console.error('Error restoring form data:', error)
+        }
+    }
+})
 </script>
 
 <style scoped>
@@ -925,6 +1027,25 @@ const resetForm = () => {
     transform: none;
 }
 
+.thm-btn.btn-login-required {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    animation: pulse 2s infinite;
+}
+
+.thm-btn.btn-login-required:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+    }
+}
+
 .thm-btn.btn-outline {
     background: transparent;
     border: 2px solid #ddd;
@@ -1086,6 +1207,118 @@ const resetForm = () => {
 .quote-info-box ul li i {
     color: #28a745;
     font-size: 12px;
+}
+
+/* Login Warning Box */
+.quote-login-warning {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    padding: 20px;
+    border-radius: 8px;
+    margin: 25px 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 15px rgba(245, 87, 108, 0.3);
+}
+
+.warning-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.warning-icon i {
+    color: #fff;
+    font-size: 24px;
+}
+
+.warning-content {
+    flex: 1;
+}
+
+.warning-content h5 {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.warning-content p {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 13px;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.login-btn {
+    background: #fff;
+    color: #f5576c;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* User Info Box */
+.quote-user-info {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    padding: 20px;
+    border-radius: 8px;
+    margin: 25px 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 15px rgba(56, 239, 125, 0.3);
+}
+
+.user-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.user-icon i {
+    color: #fff;
+    font-size: 24px;
+}
+
+.user-content {
+    flex: 1;
+}
+
+.user-content h5 {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.user-content p {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 13px;
+    margin: 0;
+    word-break: break-word;
 }
 
 .sidebar-quote-summary__bottom {
