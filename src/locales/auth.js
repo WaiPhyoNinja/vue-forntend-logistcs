@@ -82,7 +82,7 @@ export const authTranslations = {
     newPasswordMismatch: 'New passwords do not match',
     success: 'Success!',
     error: 'Error!',
-    yes: 'Yes, logout',
+    yes: 'Yes',
     cancel: 'Cancel'
   },
   'mm': {

@@ -338,7 +338,54 @@ const viewQuoteDetails = (quote) => {
     });
     
     const details = `
-        <div style="text-align: left; font-family: Arial, sans-serif;">
+        <style>
+            @media (max-width: 768px) {
+                .quote-details-grid {
+                    grid-template-columns: 1fr !important;
+                    gap: 10px !important;
+                }
+                .quote-details-mobile table {
+                    font-size: 13px !important;
+                }
+                .quote-details-mobile td {
+                    padding: 8px !important;
+                    font-size: 12px !important;
+                }
+                .quote-details-mobile th {
+                    padding: 10px !important;
+                    font-size: 13px !important;
+                }
+                .quote-details-mobile h4 {
+                    font-size: 13px !important;
+                    margin: 15px 0 8px 0 !important;
+                }
+                .quote-route-box {
+                    font-size: 11px !important;
+                    padding: 10px !important;
+                }
+                .quote-route-box h4 {
+                    font-size: 12px !important;
+                }
+                .quote-details-mobile table tbody tr td:first-child {
+                    width: 40% !important;
+                    min-width: 100px !important;
+                }
+                .swal2-title {
+                    font-size: 16px !important;
+                    padding: 10px !important;
+                }
+            }
+            @media (max-width: 480px) {
+                .quote-details-mobile td {
+                    padding: 6px !important;
+                    font-size: 11px !important;
+                }
+                .quote-route-box {
+                    font-size: 10px !important;
+                }
+            }
+        </style>
+        <div class="quote-details-mobile" style="text-align: left; font-family: Arial, sans-serif;">
             <!-- Quote Information Table -->
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 1px solid #ddd;">
                 <thead>
@@ -351,7 +398,7 @@ const viewQuoteDetails = (quote) => {
                 <tbody>
                     <tr>
                         <td style="padding: 10px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600; width: 35%;">Quote Number</td>
-                        <td style="padding: 10px; border: 1px solid #ddd;">#${quote.id.substring(0, 8).toUpperCase()}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; word-break: break-all;">#${quote.id.substring(0, 8).toUpperCase()}</td>
                     </tr>
                     <tr>
                         <td style="padding: 10px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">Quote Date</td>
@@ -369,11 +416,11 @@ const viewQuoteDetails = (quote) => {
             </table>
 
             <!-- Route Overview Box -->
-            <div style="background: #f0f2f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #e03e2d;">
+            <div class="quote-route-box" style="background: #f0f2f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #e03e2d;">
                 <h4 style="margin: 0 0 10px 0; color: #e03e2d; font-size: 14px; font-weight: 600;">
                     <i class="fas fa-route"></i> ROUTE OVERVIEW
                 </h4>
-                <div style="font-size: 13px; color: #333;">
+                <div style="font-size: 13px; color: #333; word-break: break-word;">
                     <strong>FROM:</strong> ${quote.sender_city}, ${quote.sender_country}
                     <span style="margin: 0 10px; color: #e03e2d;">→</span>
                     <strong>TO:</strong> ${quote.receiver_city}, ${quote.receiver_country}
@@ -386,7 +433,7 @@ const viewQuoteDetails = (quote) => {
             </h4>
 
             <!-- Sender and Receiver Tables Side by Side -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+            <div class="quote-details-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
                 <!-- Sender Table -->
                 <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
                     <thead>
@@ -408,7 +455,7 @@ const viewQuoteDetails = (quote) => {
                         </tr>` : ''}
                         <tr>
                             <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">Email</td>
-                            <td style="padding: 8px; border: 1px solid #ddd;">${quote.sender_email}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; word-break: break-all;">${quote.sender_email}</td>
                         </tr>
                         <tr>
                             <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">${trans.phone}</td>
@@ -416,7 +463,7 @@ const viewQuoteDetails = (quote) => {
                         </tr>
                         <tr>
                             <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">${trans.address}</td>
-                            <td style="padding: 8px; border: 1px solid #ddd;">${quote.sender_address}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; word-break: break-word;">${quote.sender_address}</td>
                         </tr>
                         <tr>
                             <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">City / State</td>
@@ -450,7 +497,7 @@ const viewQuoteDetails = (quote) => {
                         </tr>` : ''}
                         <tr>
                             <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">Email</td>
-                            <td style="padding: 8px; border: 1px solid #ddd;">${quote.receiver_email}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; word-break: break-all;">${quote.receiver_email}</td>
                         </tr>
                         <tr>
                             <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">${trans.phone}</td>
@@ -458,7 +505,7 @@ const viewQuoteDetails = (quote) => {
                         </tr>
                         <tr>
                             <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">${trans.address}</td>
-                            <td style="padding: 8px; border: 1px solid #ddd;">${quote.receiver_address}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; word-break: break-word;">${quote.receiver_address}</td>
                         </tr>
                         <tr>
                             <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">City / State</td>
@@ -523,12 +570,12 @@ const viewQuoteDetails = (quote) => {
                     ${quote.description ? `
                     <tr>
                         <td style="padding: 10px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600; width: 35%; vertical-align: top;">${trans.description}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd;">${quote.description}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; word-break: break-word;">${quote.description}</td>
                     </tr>` : ''}
                     ${quote.special_instructions ? `
                     <tr${quote.description ? ' style="background: #fafafa;"' : ''}>
                         <td style="padding: 10px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600; vertical-align: top;">${trans.specialInstructions}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd;">${quote.special_instructions}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; word-break: break-word;">${quote.special_instructions}</td>
                     </tr>` : ''}
                 </tbody>
             </table>
@@ -539,11 +586,19 @@ const viewQuoteDetails = (quote) => {
     Swal.fire({
         title: `<div style="color: #e03e2d; font-size: 20px; font-weight: 700;">Quote Request #${quote.id.substring(0, 8).toUpperCase()}</div>`,
         html: details,
-        width: '900px',
+        width: window.innerWidth < 768 ? '95%' : '900px',
         confirmButtonColor: '#e03e2d',
         confirmButtonText: trans.close,
         customClass: {
-            popup: 'quote-details-modal'
+            popup: 'quote-details-modal',
+            htmlContainer: 'quote-details-html-container'
+        },
+        didOpen: () => {
+            // Add responsive styling
+            const container = document.querySelector('.quote-details-html-container');
+            if (container && window.innerWidth < 768) {
+                container.style.padding = '10px';
+            }
         }
     });
 };
