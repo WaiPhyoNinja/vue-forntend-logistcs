@@ -378,149 +378,280 @@ const downloadPDF = async (quote) => {
         const darkGray = [51, 51, 51];
         const lightGray = [245, 245, 245];
         const mediumGray = [128, 128, 128];
+        const white = [255, 255, 255];
         
-        // Header Background
+        // Header Background with gradient effect
         doc.setFillColor(...primaryColor);
-        doc.rect(0, 0, pageWidth, 45, 'F');
+        doc.rect(0, 0, pageWidth, 50, 'F');
+        
+        // Decorative line
+        doc.setFillColor(192, 45, 31); // Darker shade
+        doc.rect(0, 50, pageWidth, 2, 'F');
         
         // Company Logo/Name
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(24);
+        doc.setTextColor(...white);
+        doc.setFontSize(26);
         doc.setFont('helvetica', 'bold');
-        doc.text('LOGISTICS', 15, 20);
-        doc.setFontSize(10);
+        doc.text('LOGISTICS', 20, 22);
+        
+        doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        doc.text('International Shipping Solutions', 15, 28);
+        doc.text('International Shipping Solutions', 20, 30);
+        doc.text('Email: info@logistics.com | Phone: +1 234 567 8900', 20, 36);
         
         // Document Title
-        doc.setFontSize(16);
+        doc.setFontSize(18);
         doc.setFont('helvetica', 'bold');
-        doc.text('SHIPPING QUOTE', pageWidth - 15, 20, { align: 'right' });
+        doc.text('SHIPPING QUOTE', pageWidth - 20, 25, { align: 'right' });
         
-        // Quote Info Box (Top Right)
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        doc.text(`Quote #: ${quote.id.substring(0, 8).toUpperCase()}`, pageWidth - 15, 28, { align: 'right' });
-        doc.text(`Date: ${new Date(quote.date_created).toLocaleDateString()}`, pageWidth - 15, 33, { align: 'right' });
-        doc.text(`Status: ${quote.status.toUpperCase()}`, pageWidth - 15, 38, { align: 'right' });
+        doc.text('REQUEST QUOTATION', pageWidth - 20, 32, { align: 'right' });
         
-        let yPos = 55;
+        let yPos = 62;
         
-        // Sender & Receiver Section
-        doc.setFillColor(...lightGray);
-        doc.rect(15, yPos, pageWidth - 30, 50, 'F');
-        
-        // Sender Info (Left Column)
-        doc.setTextColor(...primaryColor);
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.text('FROM (SENDER)', 20, yPos + 8);
-        
-        doc.setTextColor(...darkGray);
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        let senderY = yPos + 15;
-        doc.text(`${quote.sender_first_name} ${quote.sender_last_name}`, 20, senderY);
-        if (quote.sender_company) {
-            senderY += 5;
-            doc.setFont('helvetica', 'italic');
-            doc.text(quote.sender_company, 20, senderY);
-            doc.setFont('helvetica', 'normal');
-        }
-        senderY += 5;
-        doc.text(quote.sender_email, 20, senderY);
-        senderY += 5;
-        doc.text(quote.sender_phone, 20, senderY);
-        senderY += 5;
-        const senderAddr = doc.splitTextToSize(`${quote.sender_address}, ${quote.sender_city}, ${quote.sender_state}, ${quote.sender_country}`, 80);
-        doc.text(senderAddr, 20, senderY);
-        
-        // Receiver Info (Right Column)
-        doc.setTextColor(...primaryColor);
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.text('TO (RECEIVER)', pageWidth / 2 + 5, yPos + 8);
-        
-        doc.setTextColor(...darkGray);
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        let receiverY = yPos + 15;
-        doc.text(`${quote.receiver_first_name} ${quote.receiver_last_name}`, pageWidth / 2 + 5, receiverY);
-        if (quote.receiver_company) {
-            receiverY += 5;
-            doc.setFont('helvetica', 'italic');
-            doc.text(quote.receiver_company, pageWidth / 2 + 5, receiverY);
-            doc.setFont('helvetica', 'normal');
-        }
-        receiverY += 5;
-        doc.text(quote.receiver_email, pageWidth / 2 + 5, receiverY);
-        receiverY += 5;
-        doc.text(quote.receiver_phone, pageWidth / 2 + 5, receiverY);
-        receiverY += 5;
-        const receiverAddr = doc.splitTextToSize(`${quote.receiver_address}, ${quote.receiver_city}, ${quote.receiver_state}, ${quote.receiver_country}`, 80);
-        doc.text(receiverAddr, pageWidth / 2 + 5, receiverY);
-        
-        yPos += 60;
-        
-        // Shipment Details Section Header
-        doc.setTextColor(...primaryColor);
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'bold');
-        doc.text('SHIPMENT DETAILS', 15, yPos);
-        yPos += 3;
-        
-        // Shipment Details Table
-        const shipmentData = [
-            ['Shipment Type', quote.shipment_type],
-            ['Service Type', quote.service_type],
-            ['Weight', `${quote.weight} kg`],
-            ['Quantity', `${quote.quantity} package(s)`]
+        // Quote Information Table (Top Right)
+        const quoteInfoData = [
+            ['Quote Number', `#${quote.id.substring(0, 8).toUpperCase()}`],
+            ['Quote Date', new Date(quote.date_created).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })],
+            ['Status', quote.status.toUpperCase()],
+            ['Valid Until', new Date(new Date(quote.date_created).setDate(new Date(quote.date_created).getDate() + 30)).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })]
         ];
         
-        if (quote.length && quote.width && quote.height) {
-            shipmentData.push(['Dimensions (L × W × H)', `${quote.length} × ${quote.width} × ${quote.height} cm`]);
-        }
-        
-        if (quote.declared_value) {
-            shipmentData.push(['Declared Value', `$${quote.declared_value}`]);
-        }
-        
-        shipmentData.push(['Insurance', quote.insurance ? 'Yes' : 'No']);
-        
         doc.autoTable({
-            startY: yPos + 2,
-            head: [['Item', 'Details']],
-            body: shipmentData,
-            theme: 'striped',
+            startY: yPos,
+            body: quoteInfoData,
+            theme: 'grid',
+            styles: {
+                fontSize: 9,
+                cellPadding: 5,
+                lineColor: [220, 220, 220],
+                lineWidth: 0.5
+            },
+            columnStyles: {
+                0: { 
+                    cellWidth: 50, 
+                    fontStyle: 'bold',
+                    fillColor: [240, 242, 245],
+                    textColor: darkGray,
+                    halign: 'left'
+                },
+                1: { 
+                    cellWidth: 'auto',
+                    textColor: darkGray,
+                    halign: 'left'
+                }
+            },
+            margin: { left: pageWidth / 2 + 5, right: 20 }
+        });
+        
+        // Route Information Box (Left side, beside quote info)
+        doc.setFillColor(249, 250, 251);
+        doc.roundedRect(20, yPos, (pageWidth / 2) - 30, 42, 3, 3, 'F');
+        
+        doc.setTextColor(...primaryColor);
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text('ROUTE OVERVIEW', 25, yPos + 8);
+        
+        doc.setTextColor(...darkGray);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.text('FROM:', 25, yPos + 16);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`${quote.sender_city}, ${quote.sender_country}`, 25, yPos + 22);
+        
+        // Arrow
+        doc.setFontSize(12);
+        doc.text('↓', 25, yPos + 28);
+        
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.text('TO:', 25, yPos + 34);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`${quote.receiver_city}, ${quote.receiver_country}`, 25, yPos + 40);
+        
+        yPos = Math.max(doc.lastAutoTable.finalY, yPos + 42) + 15;
+        
+        // Section Divider
+        doc.setDrawColor(...primaryColor);
+        doc.setLineWidth(0.5);
+        doc.line(20, yPos, pageWidth - 20, yPos);
+        yPos += 10;
+        
+        // FROM (SENDER) and TO (RECEIVER) Section Header
+        doc.setTextColor(...primaryColor);
+        doc.setFontSize(13);
+        doc.setFont('helvetica', 'bold');
+        doc.text('SENDER & RECEIVER INFORMATION', 20, yPos);
+        yPos += 8;
+        
+        // Sender and Receiver Tables Side by Side
+        const senderData = [
+            ['Name', `${quote.sender_first_name} ${quote.sender_last_name}`],
+            ...(quote.sender_company ? [['Company', quote.sender_company]] : []),
+            ['Email', quote.sender_email],
+            ['Phone', quote.sender_phone],
+            ['Address', quote.sender_address],
+            ['City / State', `${quote.sender_city}, ${quote.sender_state}`],
+            ['Country', quote.sender_country]
+        ];
+        
+        // FROM (SENDER) Table
+        doc.autoTable({
+            startY: yPos,
+            body: senderData,
+            theme: 'grid',
+            styles: {
+                fontSize: 9,
+                cellPadding: 4,
+                lineColor: [220, 220, 220],
+                lineWidth: 0.5
+            },
             headStyles: {
                 fillColor: primaryColor,
-                textColor: [255, 255, 255],
+                textColor: white,
                 fontStyle: 'bold',
                 fontSize: 10
             },
-            bodyStyles: {
-                fontSize: 9,
-                textColor: darkGray
+            columnStyles: {
+                0: { 
+                    cellWidth: 35, 
+                    fontStyle: 'bold',
+                    fillColor: [240, 242, 245],
+                    textColor: darkGray
+                },
+                1: { 
+                    cellWidth: 'auto',
+                    textColor: darkGray
+                }
             },
-            alternateRowStyles: {
-                fillColor: [250, 250, 250]
+            margin: { left: 20, right: pageWidth / 2 + 5 },
+            didDrawPage: function(data) {
+                // Add "FROM" header above table
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(...white);
+                doc.setFillColor(...primaryColor);
+                doc.rect(20, yPos - 8, (pageWidth / 2) - 25, 7, 'F');
+                doc.text('FROM (SENDER)', 22, yPos - 3);
+            }
+        });
+        
+        const receiverData = [
+            ['Name', `${quote.receiver_first_name} ${quote.receiver_last_name}`],
+            ...(quote.receiver_company ? [['Company', quote.receiver_company]] : []),
+            ['Email', quote.receiver_email],
+            ['Phone', quote.receiver_phone],
+            ['Address', quote.receiver_address],
+            ['City / State', `${quote.receiver_city}, ${quote.receiver_state}`],
+            ['Country', quote.receiver_country]
+        ];
+        
+        // TO (RECEIVER) Table
+        doc.autoTable({
+            startY: yPos,
+            body: receiverData,
+            theme: 'grid',
+            styles: {
+                fontSize: 9,
+                cellPadding: 4,
+                lineColor: [220, 220, 220],
+                lineWidth: 0.5
             },
             columnStyles: {
-                0: { cellWidth: 60, fontStyle: 'bold' },
-                1: { cellWidth: 'auto' }
+                0: { 
+                    cellWidth: 35, 
+                    fontStyle: 'bold',
+                    fillColor: [240, 242, 245],
+                    textColor: darkGray
+                },
+                1: { 
+                    cellWidth: 'auto',
+                    textColor: darkGray
+                }
             },
-            margin: { left: 15, right: 15 }
+            margin: { left: pageWidth / 2 + 5, right: 20 },
+            didDrawPage: function(data) {
+                // Add "TO" header above table
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(...white);
+                doc.setFillColor(...primaryColor);
+                doc.rect(pageWidth / 2 + 5, yPos - 8, (pageWidth / 2) - 25, 7, 'F');
+                doc.text('TO (RECEIVER)', pageWidth / 2 + 7, yPos - 3);
+            }
+        });
+        
+        yPos = Math.max(doc.lastAutoTable.finalY, doc.previousAutoTable?.finalY || 0) + 15;
+        
+        // Section Divider
+        doc.setDrawColor(...primaryColor);
+        doc.setLineWidth(0.5);
+        doc.line(20, yPos, pageWidth - 20, yPos);
+        yPos += 10;
+        
+        // SHIPMENT DETAILS Section
+        doc.setTextColor(...primaryColor);
+        doc.setFontSize(13);
+        doc.setFont('helvetica', 'bold');
+        doc.text('SHIPMENT DETAILS', 20, yPos);
+        yPos += 5;
+        
+        // Shipment Details Table with enhanced styling
+        const shipmentTableData = [
+            ['Shipment Type', quote.shipment_type],
+            ['Service Type', quote.service_type],
+            ['Weight', `${quote.weight} kg`],
+            ['Quantity', `${quote.quantity} package(s)`],
+            ...(quote.length && quote.width && quote.height ? [['Dimensions (L × W × H)', `${quote.length} × ${quote.width} × ${quote.height} cm`]] : []),
+            ...(quote.declared_value ? [['Declared Value', `$${quote.declared_value}`]] : []),
+            ['Insurance', quote.insurance ? 'Yes ✓' : 'No']
+        ];
+        
+        doc.autoTable({
+            startY: yPos + 3,
+            body: shipmentTableData,
+            theme: 'striped',
+            styles: {
+                fontSize: 9,
+                cellPadding: 5,
+                lineColor: [220, 220, 220],
+                lineWidth: 0.5
+            },
+            columnStyles: {
+                0: { 
+                    cellWidth: 65, 
+                    fontStyle: 'bold',
+                    fillColor: [240, 242, 245],
+                    textColor: darkGray
+                },
+                1: { 
+                    cellWidth: 'auto',
+                    textColor: darkGray
+                }
+            },
+            alternateRowStyles: {
+                fillColor: [252, 252, 252]
+            },
+            margin: { left: 20, right: 20 }
         });
         
         yPos = doc.lastAutoTable.finalY + 10;
         
         // Package Description Section
         if (quote.description || quote.special_instructions) {
+            // Section Divider
+            doc.setDrawColor(...primaryColor);
+            doc.setLineWidth(0.5);
+            doc.line(20, yPos, pageWidth - 20, yPos);
+            yPos += 10;
+            
             doc.setTextColor(...primaryColor);
-            doc.setFontSize(12);
+            doc.setFontSize(13);
             doc.setFont('helvetica', 'bold');
-            doc.text('PACKAGE DESCRIPTION', 15, yPos);
-            yPos += 3;
+            doc.text('PACKAGE DESCRIPTION', 20, yPos);
+            yPos += 5;
             
             const descriptionData = [];
             if (quote.description) {
@@ -531,75 +662,106 @@ const downloadPDF = async (quote) => {
             }
             
             doc.autoTable({
-                startY: yPos + 2,
+                startY: yPos + 3,
                 body: descriptionData,
-                theme: 'plain',
-                bodyStyles: {
+                theme: 'grid',
+                styles: {
                     fontSize: 9,
-                    textColor: darkGray,
-                    cellPadding: 5
+                    cellPadding: 5,
+                    lineColor: [220, 220, 220],
+                    lineWidth: 0.5
                 },
                 columnStyles: {
-                    0: { cellWidth: 60, fontStyle: 'bold', fillColor: lightGray },
-                    1: { cellWidth: 'auto' }
+                    0: { 
+                        cellWidth: 65, 
+                        fontStyle: 'bold',
+                        fillColor: [240, 242, 245],
+                        textColor: darkGray,
+                        valign: 'top'
+                    },
+                    1: { 
+                        cellWidth: 'auto',
+                        textColor: darkGray
+                    }
                 },
-                margin: { left: 15, right: 15 }
+                margin: { left: 20, right: 20 }
             });
             
             yPos = doc.lastAutoTable.finalY + 10;
         }
         
         // Terms and Conditions Box
-        if (yPos > pageHeight - 50) {
+        if (yPos > pageHeight - 60) {
             doc.addPage();
             yPos = 20;
         }
         
-        doc.setFillColor(250, 250, 250);
-        doc.rect(15, yPos, pageWidth - 30, 30, 'F');
-        doc.setDrawColor(...mediumGray);
+        // Section Divider
+        doc.setDrawColor(...primaryColor);
         doc.setLineWidth(0.5);
-        doc.rect(15, yPos, pageWidth - 30, 30);
+        doc.line(20, yPos, pageWidth - 20, yPos);
+        yPos += 10;
         
-        doc.setTextColor(...mediumGray);
-        doc.setFontSize(8);
+        // Terms box with rounded corners
+        doc.setFillColor(252, 252, 253);
+        doc.roundedRect(20, yPos, pageWidth - 40, 35, 2, 2, 'FD');
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.5);
+        doc.roundedRect(20, yPos, pageWidth - 40, 35, 2, 2, 'S');
+        
+        doc.setTextColor(...primaryColor);
+        doc.setFontSize(9);
         doc.setFont('helvetica', 'bold');
-        doc.text('TERMS & CONDITIONS', 20, yPos + 6);
+        doc.text('TERMS & CONDITIONS', 25, yPos + 7);
         
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(7);
+        doc.setTextColor(...mediumGray);
         const terms = [
-            '• This quote is valid for 30 days from the date of issue.',
-            '• Rates are subject to change based on fuel surcharges and market conditions.',
-            '• Customer is responsible for accurate declaration of goods and compliance with customs regulations.',
-            '• Insurance coverage is optional and recommended for high-value shipments.'
+            '• This quote is valid for 30 days from the date of issue and subject to availability.',
+            '• All rates are subject to change based on fuel surcharges, seasonal adjustments, and market conditions.',
+            '• Customer is responsible for accurate declaration of goods, proper packaging, and compliance with all customs regulations.',
+            '• Insurance coverage is optional but strongly recommended for high-value or fragile shipments.',
+            '• Any additional services or special handling requirements may incur extra charges.'
         ];
-        let termsY = yPos + 12;
+        let termsY = yPos + 13;
         terms.forEach(term => {
-            doc.text(term, 20, termsY);
-            termsY += 4;
+            const splitTerm = doc.splitTextToSize(term, pageWidth - 60);
+            doc.text(splitTerm, 25, termsY);
+            termsY += 4 * splitTerm.length;
         });
         
         // Footer
-        const footerY = pageHeight - 15;
+        const footerY = pageHeight - 20;
+        
+        // Footer background
+        doc.setFillColor(249, 250, 251);
+        doc.rect(0, footerY - 8, pageWidth, 30, 'F');
+        
+        // Footer line
         doc.setDrawColor(...primaryColor);
         doc.setLineWidth(1);
-        doc.line(15, footerY - 5, pageWidth - 15, footerY - 5);
+        doc.line(20, footerY - 8, pageWidth - 20, footerY - 8);
         
-        doc.setTextColor(...mediumGray);
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...darkGray);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
         doc.text('Thank you for choosing our logistics services!', pageWidth / 2, footerY, { align: 'center' });
         
         doc.setFontSize(7);
-        doc.text(`Generated on ${new Date().toLocaleDateString()} | Document ID: ${quote.id.substring(0, 8)}`, pageWidth / 2, footerY + 5, { align: 'center' });
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...mediumGray);
+        doc.text('For questions or support, please contact us at support@logistics.com or call +1 234 567 8900', pageWidth / 2, footerY + 5, { align: 'center' });
+        
+        doc.setFontSize(7);
+        doc.text(`Generated on ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} | Document ID: ${quote.id.substring(0, 8).toUpperCase()}`, pageWidth / 2, footerY + 10, { align: 'center' });
         
         // Page numbers
         doc.setFontSize(7);
-        doc.text(`Page 1 of 1`, pageWidth - 20, footerY + 5, { align: 'right' });
+        doc.text(`Page 1 of 1`, pageWidth - 25, footerY + 10);
         
         // Save the PDF
-        doc.save(`Shipment_Quote_${quote.id.substring(0, 8)}.pdf`);
+        doc.save(`Shipment_Quote_${quote.id.substring(0, 8).toUpperCase()}.pdf`);
         
         Swal.fire({
             title: t.value.success,
