@@ -8,8 +8,8 @@
                     <div class="col-xl-8 col-lg-7">
                         <div class="quote-details">
                             <div class="quote-title">
-                                <h2>{{ t.pageTitle }}</h2>
-                                <p>{{ t.pageSubtitle }}</p>
+                                <h2>{{ editQuoteId ? 'Edit Quote Request' : t.pageTitle }}</h2>
+                                <p>{{ editQuoteId ? 'Update your quote request information' : t.pageSubtitle }}</p>
                             </div>
 
                             <!-- Step Progress Indicator -->
@@ -383,7 +383,7 @@
                                                 :disabled="isSubmitting"
                                             >
                                                 <span v-if="!isAuthenticated"><i class="fas fa-lock"></i></span>
-                                                {{ isSubmitting ? t.submitting : (isAuthenticated ? t.submitQuote : t.loginToSubmit) }}
+                                                {{ isSubmitting ? t.submitting : (isAuthenticated ? (editQuoteId ? 'Update Quote' : t.submitQuote) : t.loginToSubmit) }}
                                                 <span><i class="icon-right-arrow"></i></span>
                                             </button>
                                         </div>
@@ -553,7 +553,7 @@ import Header from '../layouts/Header.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useLanguage } from '@/composables/useLanguage'
 import { quoteTranslations } from '@/locales/quote'
-import { createItem } from '@directus/sdk'
+import { createItem, updateItem } from '@directus/sdk'
 import directus from '@/services/directus'
 import Swal from 'sweetalert2'
 
@@ -562,6 +562,7 @@ const { isAuthenticated, user, checkAuth } = useAuth()
 const { currentLanguage } = useLanguage()
 const isSubmitting = ref(false)
 const currentStep = ref(1)
+const editQuoteId = ref(null)
 
 // Translation helper
 const useQuoteTranslation = (lang) => {
@@ -706,14 +707,19 @@ const handleSubmit = async () => {
 
         console.log('Submitting quote request to Directus:', quoteData)
 
-        // Submit to Directus
-        const result = await directus.request(createItem('quote_requests', quoteData))
-        
-        console.log('Quote request created successfully:', result)
+        // Submit to Directus (create or update)
+        let result
+        if (editQuoteId.value) {
+            result = await directus.request(updateItem('quote_requests', editQuoteId.value, quoteData))
+            console.log('Quote request updated successfully:', result)
+        } else {
+            result = await directus.request(createItem('quote_requests', quoteData))
+            console.log('Quote request created successfully:', result)
+        }
 
         await Swal.fire({
             title: t.value.successTitle,
-            text: t.value.successText,
+            text: editQuoteId.value ? 'Quote request updated successfully!' : t.value.successText,
             icon: 'success',
             confirmButtonColor: '#e03e2d',
             timer: 3000
@@ -722,9 +728,19 @@ const handleSubmit = async () => {
         // Clear saved form data
         sessionStorage.removeItem('pendingQuoteRequest')
         sessionStorage.removeItem('quoteRequestStep')
+        sessionStorage.removeItem('editQuoteData')
         
         resetForm()
         currentStep.value = 1
+        
+        // Redirect to My Account if updating
+        if (editQuoteId.value) {
+            editQuoteId.value = null
+            router.push('/my-account')
+            return
+        }
+        
+        editQuoteId.value = null
     } catch (error) {
         console.error('Error submitting quote:', error)
         
@@ -831,6 +847,70 @@ const resetForm = () => {
 onMounted(async () => {
     await checkAuth()
     
+    // Check for edit mode first
+    const editData = sessionStorage.getItem('editQuoteData')
+    if (editData && isAuthenticated.value) {
+        try {
+            const quote = JSON.parse(editData)
+            editQuoteId.value = quote.id
+            
+            // Populate form with edit data
+            formData.value = {
+                sender: {
+                    firstName: quote.sender_first_name || '',
+                    lastName: quote.sender_last_name || '',
+                    company: quote.sender_company || '',
+                    email: quote.sender_email || '',
+                    phone: quote.sender_phone || '',
+                    address: quote.sender_address || '',
+                    city: quote.sender_city || '',
+                    state: quote.sender_state || '',
+                    country: quote.sender_country || '',
+                    postalCode: quote.sender_zip || ''
+                },
+                receiver: {
+                    firstName: quote.receiver_first_name || '',
+                    lastName: quote.receiver_last_name || '',
+                    company: quote.receiver_company || '',
+                    email: quote.receiver_email || '',
+                    phone: quote.receiver_phone || '',
+                    address: quote.receiver_address || '',
+                    city: quote.receiver_city || '',
+                    state: quote.receiver_state || '',
+                    country: quote.receiver_country || '',
+                    postalCode: quote.receiver_zip || ''
+                },
+                shipment: {
+                    type: quote.shipment_type || '',
+                    service: quote.service_type || '',
+                    weight: quote.weight || '',
+                    length: quote.length || '',
+                    width: quote.width || '',
+                    height: quote.height || '',
+                    quantity: quote.quantity || 1,
+                    declaredValue: quote.declared_value || '',
+                    description: quote.description || '',
+                    specialInstructions: quote.special_instructions || '',
+                    insurance: quote.insurance || false
+                }
+            }
+            
+            await Swal.fire({
+                title: 'Edit Mode',
+                text: `Editing Quote Request #${quote.id.substring(0, 8)}`,
+                icon: 'info',
+                confirmButtonColor: '#e03e2d',
+                timer: 2500
+            })
+            
+            return
+        } catch (error) {
+            console.error('Error loading edit data:', error)
+            sessionStorage.removeItem('editQuoteData')
+        }
+    }
+    
+    // Otherwise check for pending quote data
     const savedFormData = sessionStorage.getItem('pendingQuoteRequest')
     const savedStep = sessionStorage.getItem('quoteRequestStep')
     

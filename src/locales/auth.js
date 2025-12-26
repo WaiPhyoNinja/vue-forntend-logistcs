@@ -167,7 +167,7 @@ export const authTranslations = {
     newPasswordMismatch: 'စကားဝှက်အသစ်များ မတူညီပါ',
     success: 'အောင်မြင်ပါသည်!',
     error: 'အမှားအယွင်း!',
-    yes: 'ဟုတ်ကဲ့၊ ထွက်မည်',
+    yes: 'ဟုတ်ကဲ့',
     cancel: 'မထွက်တော့ပါ'
   },
   'th': {
