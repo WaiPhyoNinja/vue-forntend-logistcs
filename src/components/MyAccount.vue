@@ -290,14 +290,25 @@ onMounted(async () => {
 const fetchQuoteRequests = async () => {
     loadingQuotes.value = true;
     try {
+        if (!user.value?.id) {
+            console.log('No user ID available');
+            quoteRequests.value = [];
+            return;
+        }
+
         const response = await directus.request(
             readItems('quote_requests', {
+                filter: {
+                    user_created: {
+                        _eq: user.value.id
+                    }
+                },
                 sort: ['-date_created'],
                 limit: 50
             })
         );
         quoteRequests.value = response;
-        console.log('Quote requests loaded:', response);
+        console.log('Quote requests loaded for user:', user.value.id, response);
     } catch (error) {
         console.error('Error fetching quote requests:', error);
         if (error.response?.status !== 403) {
