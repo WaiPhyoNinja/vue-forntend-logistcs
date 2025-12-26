@@ -148,7 +148,7 @@ export const authTranslations = {
     description: 'ဖော်ပြချက်',
     specialInstructions: 'အထူးညွှန်ကြားချက်',
     yes: 'ရှိသည်',
-    no: 'မရှိပါ',
+    no: 'မရှိ',
     close: 'ပိတ်မည်',
     from: 'မှ',
     to: 'သို့',
@@ -167,7 +167,7 @@ export const authTranslations = {
     newPasswordMismatch: 'စကားဝှက်အသစ်များ မတူညီပါ',
     success: 'အောင်မြင်ပါသည်!',
     error: 'အမှားအယွင်း!',
-    yes: 'ဟုတ်ကဲ့',
+    yes: 'ရှိ',
     cancel: 'မထွက်တော့ပါ'
   },
   'th': {

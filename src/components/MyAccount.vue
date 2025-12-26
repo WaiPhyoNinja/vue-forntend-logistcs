@@ -326,50 +326,225 @@ const formatDate = (dateString) => {
 
 const viewQuoteDetails = (quote) => {
     const trans = t.value;
+    const quoteDate = new Date(quote.date_created).toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    const validUntil = new Date(new Date(quote.date_created).setDate(new Date(quote.date_created).getDate() + 30)).toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    
     const details = `
-        <div style="text-align: left;">
-            <h4 style="color: #e03e2d; margin-bottom: 15px;">${trans.shipmentDetails}</h4>
-            
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                <h5 style="margin-top: 0; color: #333;">${trans.fromSender}</h5>
-                <p style="margin: 5px 0;"><strong>${trans.name}:</strong> ${quote.sender_first_name} ${quote.sender_last_name}</p>
-                ${quote.sender_company ? `<p style="margin: 5px 0;"><strong>${trans.company}:</strong> ${quote.sender_company}</p>` : ''}
-                <p style="margin: 5px 0;"><strong>${trans.email.replace('...', '')}:</strong> ${quote.sender_email}</p>
-                <p style="margin: 5px 0;"><strong>${trans.phone}:</strong> ${quote.sender_phone}</p>
-                <p style="margin: 5px 0;"><strong>${trans.address}:</strong> ${quote.sender_address}, ${quote.sender_city}, ${quote.sender_state}, ${quote.sender_country}</p>
+        <div style="text-align: left; font-family: Arial, sans-serif;">
+            <!-- Quote Information Table -->
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 1px solid #ddd;">
+                <thead>
+                    <tr>
+                        <th colspan="2" style="background: #e03e2d; color: white; padding: 12px; text-align: left; font-size: 14px; font-weight: 600;">
+                            QUOTE INFORMATION
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600; width: 35%;">Quote Number</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">#${quote.id.substring(0, 8).toUpperCase()}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">Quote Date</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${quoteDate}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">Status</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;"><span style="background: ${quote.status === 'approved' ? '#10b981' : quote.status === 'pending' ? '#fbbf24' : '#60a5fa'}; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: uppercase;">${quote.status}</span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">Valid Until</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${validUntil}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Route Overview Box -->
+            <div style="background: #f0f2f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #e03e2d;">
+                <h4 style="margin: 0 0 10px 0; color: #e03e2d; font-size: 14px; font-weight: 600;">
+                    <i class="fas fa-route"></i> ROUTE OVERVIEW
+                </h4>
+                <div style="font-size: 13px; color: #333;">
+                    <strong>FROM:</strong> ${quote.sender_city}, ${quote.sender_country}
+                    <span style="margin: 0 10px; color: #e03e2d;">→</span>
+                    <strong>TO:</strong> ${quote.receiver_city}, ${quote.receiver_country}
+                </div>
             </div>
-            
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                <h5 style="margin-top: 0; color: #333;">${trans.toReceiver}</h5>
-                <p style="margin: 5px 0;"><strong>${trans.name}:</strong> ${quote.receiver_first_name} ${quote.receiver_last_name}</p>
-                ${quote.receiver_company ? `<p style="margin: 5px 0;"><strong>${trans.company}:</strong> ${quote.receiver_company}</p>` : ''}
-                <p style="margin: 5px 0;"><strong>${trans.email.replace('...', '')}:</strong> ${quote.receiver_email}</p>
-                <p style="margin: 5px 0;"><strong>${trans.phone}:</strong> ${quote.receiver_phone}</p>
-                <p style="margin: 5px 0;"><strong>${trans.address}:</strong> ${quote.receiver_address}, ${quote.receiver_city}, ${quote.receiver_state}, ${quote.receiver_country}</p>
+
+            <!-- Section Title -->
+            <h4 style="color: #e03e2d; margin: 20px 0 10px 0; font-size: 15px; font-weight: 600; text-transform: uppercase; border-bottom: 2px solid #e03e2d; padding-bottom: 8px;">
+                Sender & Receiver Information
+            </h4>
+
+            <!-- Sender and Receiver Tables Side by Side -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                <!-- Sender Table -->
+                <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
+                    <thead>
+                        <tr>
+                            <th colspan="2" style="background: #e03e2d; color: white; padding: 10px; text-align: left; font-size: 13px; font-weight: 600;">
+                                FROM (SENDER)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600; width: 40%;">${trans.name}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${quote.sender_first_name} ${quote.sender_last_name}</td>
+                        </tr>
+                        ${quote.sender_company ? `
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">${trans.company}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${quote.sender_company}</td>
+                        </tr>` : ''}
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">Email</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${quote.sender_email}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">${trans.phone}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${quote.sender_phone}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">${trans.address}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${quote.sender_address}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">City / State</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${quote.sender_city}, ${quote.sender_state}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">Country</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${quote.sender_country}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Receiver Table -->
+                <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
+                    <thead>
+                        <tr>
+                            <th colspan="2" style="background: #e03e2d; color: white; padding: 10px; text-align: left; font-size: 13px; font-weight: 600;">
+                                TO (RECEIVER)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600; width: 40%;">${trans.name}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${quote.receiver_first_name} ${quote.receiver_last_name}</td>
+                        </tr>
+                        ${quote.receiver_company ? `
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">${trans.company}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${quote.receiver_company}</td>
+                        </tr>` : ''}
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">Email</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${quote.receiver_email}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">${trans.phone}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${quote.receiver_phone}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">${trans.address}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${quote.receiver_address}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">City / State</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${quote.receiver_city}, ${quote.receiver_state}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">Country</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${quote.receiver_country}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                <h5 style="margin-top: 0; color: #333;">${trans.packageInfo}</h5>
-                <p style="margin: 5px 0;"><strong>${trans.type}:</strong> ${quote.shipment_type}</p>
-                <p style="margin: 5px 0;"><strong>${trans.service}:</strong> ${quote.service_type}</p>
-                <p style="margin: 5px 0;"><strong>${trans.weight}:</strong> ${quote.weight} kg</p>
-                ${quote.length && quote.width && quote.height ? 
-                    `<p style="margin: 5px 0;"><strong>${trans.dimensions}:</strong> ${quote.length} × ${quote.width} × ${quote.height} cm</p>` : ''}
-                <p style="margin: 5px 0;"><strong>${trans.quantity}:</strong> ${quote.quantity} package(s)</p>
-                ${quote.declared_value ? `<p style="margin: 5px 0;"><strong>${trans.declaredValue}:</strong> $${quote.declared_value}</p>` : ''}
-                <p style="margin: 5px 0;"><strong>${trans.insurance}:</strong> ${quote.insurance ? trans.yes : trans.no}</p>
-                <p style="margin: 5px 0;"><strong>${trans.description}:</strong> ${quote.description}</p>
-                ${quote.special_instructions ? `<p style="margin: 5px 0;"><strong>${trans.specialInstructions}:</strong> ${quote.special_instructions}</p>` : ''}
-            </div>
+
+            <!-- Section Title -->
+            <h4 style="color: #e03e2d; margin: 20px 0 10px 0; font-size: 15px; font-weight: 600; text-transform: uppercase; border-bottom: 2px solid #e03e2d; padding-bottom: 8px;">
+                Shipment Details
+            </h4>
+
+            <!-- Shipment Details Table -->
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 1px solid #ddd;">
+                <tbody>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600; width: 35%;">Shipment Type</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${quote.shipment_type}</td>
+                    </tr>
+                    <tr style="background: #fafafa;">
+                        <td style="padding: 10px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">Service Type</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${quote.service_type}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">${trans.weight}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${quote.weight} kg</td>
+                    </tr>
+                    ${quote.length && quote.width && quote.height ? `
+                    <tr style="background: #fafafa;">
+                        <td style="padding: 10px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">${trans.dimensions}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${quote.length} × ${quote.width} × ${quote.height} cm</td>
+                    </tr>` : ''}
+                    <tr${quote.length && quote.width && quote.height ? '' : ' style="background: #fafafa;"'}>
+                        <td style="padding: 10px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">${trans.quantity}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${quote.quantity} package(s)</td>
+                    </tr>
+                    ${quote.declared_value ? `
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">${trans.declaredValue}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">$${quote.declared_value}</td>
+                    </tr>` : ''}
+                    <tr${quote.declared_value ? ' style="background: #fafafa;"' : ''}>
+                        <td style="padding: 10px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600;">${trans.insurance}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${quote.insurance ? '✓ ' + trans.yes : trans.no}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Package Description Table -->
+            ${quote.description || quote.special_instructions ? `
+            <h4 style="color: #e03e2d; margin: 20px 0 10px 0; font-size: 15px; font-weight: 600; text-transform: uppercase; border-bottom: 2px solid #e03e2d; padding-bottom: 8px;">
+                Package Description
+            </h4>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 1px solid #ddd;">
+                <tbody>
+                    ${quote.description ? `
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600; width: 35%; vertical-align: top;">${trans.description}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${quote.description}</td>
+                    </tr>` : ''}
+                    ${quote.special_instructions ? `
+                    <tr${quote.description ? ' style="background: #fafafa;"' : ''}>
+                        <td style="padding: 10px; border: 1px solid #ddd; background: #f8f9fa; font-weight: 600; vertical-align: top;">${trans.specialInstructions}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">${quote.special_instructions}</td>
+                    </tr>` : ''}
+                </tbody>
+            </table>
+            ` : ''}
         </div>
     `;
     
     Swal.fire({
-        title: `Quote Request #${quote.id.substring(0, 8)}`,
+        title: `<div style="color: #e03e2d; font-size: 20px; font-weight: 700;">Quote Request #${quote.id.substring(0, 8).toUpperCase()}</div>`,
         html: details,
-        width: '700px',
+        width: '900px',
         confirmButtonColor: '#e03e2d',
-        confirmButtonText: trans.close
+        confirmButtonText: trans.close,
+        customClass: {
+            popup: 'quote-details-modal'
+        }
     });
 };
 
