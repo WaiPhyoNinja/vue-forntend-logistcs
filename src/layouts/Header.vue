@@ -63,7 +63,6 @@ const getSocialIconUrl = (iconId) => {
 
 // Watch for language changes and apply body class
 watch(currentLanguage, (newLang) => {
-  // Remove all language classes first
   document.body.classList.remove('myanmar-lang', 'thai-lang');
   
   // Add appropriate class based on language
@@ -401,74 +400,8 @@ onMounted(async () => {
                         </div>
                     </div>
                 </div>
-            </div><!-- /.sticky-header__content -->
-        </div>
-
-    <!-- Contact Popup Sidebar -->
-    <div class="contact-popup-sidebar" :class="{ 'active': showContactPopup }">
-        <div class="contact-popup-overlay" @click="showContactPopup = false"></div>
-        <div class="contact-popup-content">
-            <button class="contact-popup-close" @click="showContactPopup = false">
-                <i class="fa fa-times"></i>
-            </button>
-            
-            <div class="contact-popup-header">
-                <h3>Get In Touch</h3>
-                <p>Contact us for any inquiries</p>
-            </div>
-
-            <div class="contact-popup-body">
-                <div class="contact-info-item">
-                    <div class="icon">
-                        <i class="icon-phone-call"></i>
-                    </div>
-                    <div class="content">
-                        <h5>Phone</h5>
-                        <p><a :href="'tel:' + (currentTranslation?.phone || '')">{{ currentTranslation?.phone || '' }}</a></p>
-                    </div>
-                </div>
-
-                <div class="contact-info-item">
-                    <div class="icon">
-                        <i class="icon-email"></i>
-                    </div>
-                    <div class="content">
-                        <h5>Email</h5>
-                        <p><a :href="'mailto:' + (currentTranslation?.email || '')">{{ currentTranslation?.email || '' }}</a></p>
-                    </div>
-                </div>
-
-                <div class="contact-info-item">
-                    <div class="icon">
-                        <i class="icon-location1"></i>
-                    </div>
-                    <div class="content">
-                        <h5>Address</h5>
-                        <p>{{ currentTranslation?.address || '' }}</p>
-                    </div>
-                </div>
-
-                <div class="contact-info-item">
-                    <div class="icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div class="content">
-                        <h5>Opening Hours</h5>
-                        <p>{{ currentTranslation?.opening_hours || '' }}</p>
-                    </div>
-                </div>
-
-                <div class="contact-social" v-if="socialIcons.length > 0">
-                    <h5>Follow Us</h5>
-                    <div class="social-links">
-                        <a v-for="social in socialIcons" :key="social.id" :href="social.link" target="_blank" rel="noopener noreferrer">
-                            <img :src="getSocialIconUrl(social.icon)" :alt="social.link" style="width: 20px; height: 20px; object-fit: contain;">
-                        </a>
-                    </div>
-                </div>
             </div>
         </div>
-    </div>
 </template>
 
 <style scoped>
