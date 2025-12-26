@@ -159,6 +159,13 @@
                                                     <i class="fas fa-eye"></i> {{ t.viewDetails }}
                                                 </button>
                                                 <button 
+                                                    v-if="quote.status === 'pending'" 
+                                                    @click="editQuote(quote)" 
+                                                    class="btn-edit-quote"
+                                                >
+                                                    <i class="fas fa-edit"></i> {{ t.editQuote }}
+                                                </button>
+                                                <button 
                                                     v-if="quote.status === 'approved'" 
                                                     @click="downloadPDF(quote)" 
                                                     class="btn-download-pdf"
@@ -364,6 +371,50 @@ const viewQuoteDetails = (quote) => {
         confirmButtonColor: '#e03e2d',
         confirmButtonText: trans.close
     });
+};
+
+const editQuote = (quote) => {
+    // Store the quote data in sessionStorage for editing
+    const quoteData = {
+        id: quote.id,
+        isEditing: true,
+        sender_first_name: quote.sender_first_name,
+        sender_last_name: quote.sender_last_name,
+        sender_company: quote.sender_company || '',
+        sender_email: quote.sender_email,
+        sender_phone: quote.sender_phone,
+        sender_address: quote.sender_address,
+        sender_city: quote.sender_city,
+        sender_state: quote.sender_state,
+        sender_zip: quote.sender_zip || '',
+        sender_country: quote.sender_country,
+        receiver_first_name: quote.receiver_first_name,
+        receiver_last_name: quote.receiver_last_name,
+        receiver_company: quote.receiver_company || '',
+        receiver_email: quote.receiver_email,
+        receiver_phone: quote.receiver_phone,
+        receiver_address: quote.receiver_address,
+        receiver_city: quote.receiver_city,
+        receiver_state: quote.receiver_state,
+        receiver_zip: quote.receiver_zip || '',
+        receiver_country: quote.receiver_country,
+        shipment_type: quote.shipment_type,
+        service_type: quote.service_type,
+        weight: quote.weight,
+        length: quote.length || '',
+        width: quote.width || '',
+        height: quote.height || '',
+        quantity: quote.quantity,
+        declared_value: quote.declared_value || '',
+        insurance: quote.insurance,
+        description: quote.description,
+        special_instructions: quote.special_instructions || ''
+    };
+    
+    sessionStorage.setItem('editQuoteData', JSON.stringify(quoteData));
+    
+    // Navigate to request quote page
+    router.push('/request-quote');
 };
 
 const downloadPDF = async (quote) => {
@@ -1222,6 +1273,31 @@ const handleLogout = async () => {
 }
 
 .btn-download-pdf i {
+    font-size: 16px;
+}
+
+.btn-edit-quote {
+    background: #3b82f6;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-edit-quote:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.btn-edit-quote i {
     font-size: 16px;
 }
 
