@@ -80,15 +80,108 @@
                         <!-- Orders Tab -->
                         <div v-if="activeTab === 'orders'" class="account-content-box">
                             <h3>{{ t.myOrders }}</h3>
-                            <div v-if="orders.length === 0" class="empty-state">
-                                <i class="fas fa-box-open" style="font-size: 60px; color: #ccc;"></i>
-                                <p>{{ t.noOrders }}</p>
+                            
+                            <!-- Quote Requests Section -->
+                            <div class="quote-requests-section">
+                                <h4 style="margin-top: 0; margin-bottom: 20px; color: #e03e2d;">
+                                    <i class="fas fa-file-invoice"></i> Quote Requests
+                                </h4>
+                                
+                                <div v-if="loadingQuotes" class="loading-state">
+                                    <i class="fas fa-spinner fa-spin" style="font-size: 40px; color: #e03e2d;"></i>
+                                    <p>Loading quote requests...</p>
+                                </div>
+                                
+                                <div v-else-if="quoteRequests.length === 0" class="empty-state">
+                                    <i class="fas fa-file-invoice" style="font-size: 50px; color: #ccc;"></i>
+                                    <p>No quote requests found</p>
+                                    <button @click="router.push('/request-quote')" class="thm-btn" style="margin-top: 15px;">
+                                        Request a Quote
+                                        <span><i class="icon-right-arrow"></i></span>
+                                    </button>
+                                </div>
+                                
+                                <div v-else class="quotes-list">
+                                    <div v-for="quote in quoteRequests" :key="quote.id" class="quote-item">
+                                        <div class="quote-header">
+                                            <div class="quote-id">
+                                                <strong>Quote #{{ quote.id.substring(0, 8) }}</strong>
+                                                <span :class="['status-badge', `status-${quote.status}`]">
+                                                    {{ quote.status }}
+                                                </span>
+                                            </div>
+                                            <div class="quote-date">
+                                                <i class="fas fa-calendar"></i>
+                                                {{ formatDate(quote.date_created) }}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="quote-details">
+                                            <div class="quote-route">
+                                                <div class="route-info">
+                                                    <i class="fas fa-map-marker-alt text-success"></i>
+                                                    <div>
+                                                        <strong>From:</strong>
+                                                        <p>{{ quote.sender_city }}, {{ quote.sender_country }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="route-arrow">
+                                                    <i class="fas fa-arrow-right"></i>
+                                                </div>
+                                                <div class="route-info">
+                                                    <i class="fas fa-map-pin text-danger"></i>
+                                                    <div>
+                                                        <strong>To:</strong>
+                                                        <p>{{ quote.receiver_city }}, {{ quote.receiver_country }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="quote-info-grid">
+                                                <div class="info-item">
+                                                    <i class="fas fa-box"></i>
+                                                    <span>{{ quote.shipment_type }}</span>
+                                                </div>
+                                                <div class="info-item">
+                                                    <i class="fas fa-shipping-fast"></i>
+                                                    <span>{{ quote.service_type }}</span>
+                                                </div>
+                                                <div class="info-item">
+                                                    <i class="fas fa-weight"></i>
+                                                    <span>{{ quote.weight }} kg</span>
+                                                </div>
+                                                <div class="info-item">
+                                                    <i class="fas fa-boxes"></i>
+                                                    <span>{{ quote.quantity }} package(s)</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="quote-actions">
+                                                <button @click="viewQuoteDetails(quote)" class="btn-view-details">
+                                                    <i class="fas fa-eye"></i> View Details
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div v-else class="orders-list">
-                                <div v-for="order in orders" :key="order.id" class="order-item">
-                                    <h4>{{ t.orderNumber }} #{{ order.id }}</h4>
-                                    <p>{{ t.orderDate }}: {{ new Date(order.date_created).toLocaleDateString() }}</p>
-                                    <p>{{ t.orderStatus }}: <span class="badge">{{ order.status }}</span></p>
+                            
+                            <!-- Regular Orders Section -->
+                            <div class="orders-section" style="margin-top: 40px;">
+                                <h4 style="margin-bottom: 20px; color: #e03e2d;">
+                                    <i class="fas fa-box"></i> Orders
+                                </h4>
+                                
+                                <div v-if="orders.length === 0" class="empty-state">
+                                    <i class="fas fa-box-open" style="font-size: 50px; color: #ccc;"></i>
+                                    <p>{{ t.noOrders }}</p>
+                                </div>
+                                <div v-else class="orders-list">
+                                    <div v-for="order in orders" :key="order.id" class="order-item">
+                                        <h4>{{ t.orderNumber }} #{{ order.id }}</h4>
+                                        <p>{{ t.orderDate }}: {{ new Date(order.date_created).toLocaleDateString() }}</p>
+                                        <p>{{ t.orderStatus }}: <span class="badge">{{ order.status }}</span></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -140,6 +233,8 @@ import { useRouter } from 'vue-router';
 import { useAuth } from '@/composables/useAuth';
 import { useLanguage } from '@/composables/useLanguage';
 import { useAuthTranslation } from '@/locales/auth';
+import { readItems } from '@directus/sdk';
+import directus from '@/services/directus';
 import Swal from 'sweetalert2';
 import Header from '../layouts/Header.vue';
 import Footer from '../layouts/Footer.vue';
@@ -152,6 +247,8 @@ const t = computed(() => useAuthTranslation(currentLanguage.value));
 const activeTab = ref('profile');
 const isUpdating = ref(false);
 const orders = ref([]);
+const quoteRequests = ref([]);
+const loadingQuotes = ref(false);
 
 const profileData = ref({
     first_name: '',
@@ -165,15 +262,103 @@ const passwordData = ref({
     confirm: ''
 });
 
-onMounted(() => {
+onMounted(async () => {
     if (user.value) {
         profileData.value = {
             first_name: user.value.first_name || '',
             last_name: user.value.last_name || '',
             email: user.value.email || ''
         };
+        
+        // Fetch quote requests
+        await fetchQuoteRequests();
     }
 });
+
+const fetchQuoteRequests = async () => {
+    loadingQuotes.value = true;
+    try {
+        const response = await directus.request(
+            readItems('quote_requests', {
+                sort: ['-date_created'],
+                limit: 50
+            })
+        );
+        quoteRequests.value = response;
+        console.log('Quote requests loaded:', response);
+    } catch (error) {
+        console.error('Error fetching quote requests:', error);
+        if (error.response?.status !== 403) {
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to load quote requests',
+                icon: 'error',
+                confirmButtonColor: '#e03e2d'
+            });
+        }
+    } finally {
+        loadingQuotes.value = false;
+    }
+};
+
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+};
+
+const viewQuoteDetails = (quote) => {
+    const details = `
+        <div style="text-align: left;">
+            <h4 style="color: #e03e2d; margin-bottom: 15px;">Shipment Details</h4>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <h5 style="margin-top: 0; color: #333;">From (Sender)</h5>
+                <p style="margin: 5px 0;"><strong>Name:</strong> ${quote.sender_first_name} ${quote.sender_last_name}</p>
+                ${quote.sender_company ? `<p style="margin: 5px 0;"><strong>Company:</strong> ${quote.sender_company}</p>` : ''}
+                <p style="margin: 5px 0;"><strong>Email:</strong> ${quote.sender_email}</p>
+                <p style="margin: 5px 0;"><strong>Phone:</strong> ${quote.sender_phone}</p>
+                <p style="margin: 5px 0;"><strong>Address:</strong> ${quote.sender_address}, ${quote.sender_city}, ${quote.sender_state}, ${quote.sender_country}</p>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <h5 style="margin-top: 0; color: #333;">To (Receiver)</h5>
+                <p style="margin: 5px 0;"><strong>Name:</strong> ${quote.receiver_first_name} ${quote.receiver_last_name}</p>
+                ${quote.receiver_company ? `<p style="margin: 5px 0;"><strong>Company:</strong> ${quote.receiver_company}</p>` : ''}
+                <p style="margin: 5px 0;"><strong>Email:</strong> ${quote.receiver_email}</p>
+                <p style="margin: 5px 0;"><strong>Phone:</strong> ${quote.receiver_phone}</p>
+                <p style="margin: 5px 0;"><strong>Address:</strong> ${quote.receiver_address}, ${quote.receiver_city}, ${quote.receiver_state}, ${quote.receiver_country}</p>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                <h5 style="margin-top: 0; color: #333;">Package Information</h5>
+                <p style="margin: 5px 0;"><strong>Type:</strong> ${quote.shipment_type}</p>
+                <p style="margin: 5px 0;"><strong>Service:</strong> ${quote.service_type}</p>
+                <p style="margin: 5px 0;"><strong>Weight:</strong> ${quote.weight} kg</p>
+                ${quote.length && quote.width && quote.height ? 
+                    `<p style="margin: 5px 0;"><strong>Dimensions:</strong> ${quote.length} × ${quote.width} × ${quote.height} cm</p>` : ''}
+                <p style="margin: 5px 0;"><strong>Quantity:</strong> ${quote.quantity} package(s)</p>
+                ${quote.declared_value ? `<p style="margin: 5px 0;"><strong>Declared Value:</strong> $${quote.declared_value}</p>` : ''}
+                <p style="margin: 5px 0;"><strong>Insurance:</strong> ${quote.insurance ? 'Yes' : 'No'}</p>
+                <p style="margin: 5px 0;"><strong>Description:</strong> ${quote.description}</p>
+                ${quote.special_instructions ? `<p style="margin: 5px 0;"><strong>Special Instructions:</strong> ${quote.special_instructions}</p>` : ''}
+            </div>
+        </div>
+    `;
+    
+    Swal.fire({
+        title: `Quote Request #${quote.id.substring(0, 8)}`,
+        html: details,
+        width: '700px',
+        confirmButtonColor: '#e03e2d',
+        confirmButtonText: 'Close'
+    });
+};
 
 const updateProfile = async () => {
     isUpdating.value = true;
@@ -394,5 +579,223 @@ const handleLogout = async () => {
     padding: 3px 10px;
     border-radius: 3px;
     font-size: 12px;
+}
+
+/* Quote Requests Styles */
+.loading-state {
+    text-align: center;
+    padding: 40px;
+}
+
+.loading-state p {
+    color: #666;
+    margin-top: 15px;
+    font-size: 16px;
+}
+
+.quotes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.quote-item {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.quote-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.quote-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.quote-id {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.quote-id strong {
+    font-size: 16px;
+}
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.status-badge.status-pending {
+    background: #fbbf24;
+    color: #92400e;
+}
+
+.status-badge.status-reviewed {
+    background: #60a5fa;
+    color: #1e3a8a;
+}
+
+.status-badge.status-quoted {
+    background: #34d399;
+    color: #065f46;
+}
+
+.status-badge.status-approved {
+    background: #10b981;
+    color: #064e3b;
+}
+
+.status-badge.status-rejected {
+    background: #f87171;
+    color: #7f1d1d;
+}
+
+.quote-date {
+    font-size: 14px;
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.quote-details {
+    padding: 20px;
+}
+
+.quote-route {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+.route-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex: 1;
+}
+
+.route-info i {
+    font-size: 20px;
+    margin-top: 3px;
+}
+
+.route-info strong {
+    display: block;
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 3px;
+}
+
+.route-info p {
+    margin: 0;
+    color: #111827;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.route-arrow {
+    color: #9ca3af;
+    font-size: 18px;
+}
+
+.quote-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #f9fafb;
+    border-radius: 6px;
+}
+
+.info-item i {
+    color: #e03e2d;
+    font-size: 18px;
+}
+
+.info-item span {
+    font-size: 14px;
+    color: #374151;
+    font-weight: 500;
+}
+
+.quote-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 15px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.btn-view-details {
+    background: #e03e2d;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-view-details:hover {
+    background: #c02d1f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(224, 62, 45, 0.3);
+}
+
+.btn-view-details i {
+    font-size: 16px;
+}
+
+@media (max-width: 768px) {
+    .quote-route {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .route-arrow {
+        transform: rotate(90deg);
+    }
+    
+    .quote-info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .quote-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
 }
 </style>
