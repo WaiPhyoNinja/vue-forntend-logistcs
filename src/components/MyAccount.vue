@@ -82,19 +82,19 @@
                         <h3>{{ t.myRequestQuote }}</h3>                            <!-- Quote Requests Section -->
                             <div class="quote-requests-section" style="margin-bottom: 40px;">
                                 <h4 style="margin-top: 0; margin-bottom: 20px; color: #e03e2d;">
-                                    <i class="fas fa-file-invoice"></i> Quote Requests
+                                    <i class="fas fa-file-invoice"></i> {{ t.quoteRequests }}
                                 </h4>
                                 
                                 <div v-if="loadingQuotes" class="loading-state">
                                     <i class="fas fa-spinner fa-spin" style="font-size: 40px; color: #e03e2d;"></i>
-                                    <p>Loading quote requests...</p>
+                                    <p>{{ t.loadingQuotes }}</p>
                                 </div>
                                 
                                 <div v-else-if="quoteRequests.length === 0" class="empty-state">
                                     <i class="fas fa-file-invoice" style="font-size: 50px; color: #ccc;"></i>
-                                    <p>No quote requests found</p>
+                                    <p>{{ t.noQuotesFound }}</p>
                                     <button @click="router.push('/request-quote')" class="thm-btn" style="margin-top: 15px;">
-                                        Request a Quote
+                                        {{ t.requestQuote }}
                                         <span><i class="icon-right-arrow"></i></span>
                                     </button>
                                 </div>
@@ -119,7 +119,7 @@
                                                 <div class="route-info">
                                                     <i class="fas fa-map-marker-alt text-success"></i>
                                                     <div>
-                                                        <strong>From:</strong>
+                                                        <strong>{{ t.from }}:</strong>
                                                         <p>{{ quote.sender_city }}, {{ quote.sender_country }}</p>
                                                     </div>
                                                 </div>
@@ -129,7 +129,7 @@
                                                 <div class="route-info">
                                                     <i class="fas fa-map-pin text-danger"></i>
                                                     <div>
-                                                        <strong>To:</strong>
+                                                        <strong>{{ t.to }}:</strong>
                                                         <p>{{ quote.receiver_city }}, {{ quote.receiver_country }}</p>
                                                     </div>
                                                 </div>
@@ -156,7 +156,14 @@
                                             
                                             <div class="quote-actions">
                                                 <button @click="viewQuoteDetails(quote)" class="btn-view-details">
-                                                    <i class="fas fa-eye"></i> View Details
+                                                    <i class="fas fa-eye"></i> {{ t.viewDetails }}
+                                                </button>
+                                                <button 
+                                                    v-if="quote.status === 'approved'" 
+                                                    @click="downloadPDF(quote)" 
+                                                    class="btn-download-pdf"
+                                                >
+                                                    <i class="fas fa-download"></i> {{ t.downloadPDF }}
                                                 </button>
                                             </div>
                                         </div>
@@ -311,40 +318,41 @@ const formatDate = (dateString) => {
 };
 
 const viewQuoteDetails = (quote) => {
+    const trans = t.value;
     const details = `
         <div style="text-align: left;">
-            <h4 style="color: #e03e2d; margin-bottom: 15px;">Shipment Details</h4>
+            <h4 style="color: #e03e2d; margin-bottom: 15px;">${trans.shipmentDetails}</h4>
             
             <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                <h5 style="margin-top: 0; color: #333;">From (Sender)</h5>
-                <p style="margin: 5px 0;"><strong>Name:</strong> ${quote.sender_first_name} ${quote.sender_last_name}</p>
-                ${quote.sender_company ? `<p style="margin: 5px 0;"><strong>Company:</strong> ${quote.sender_company}</p>` : ''}
-                <p style="margin: 5px 0;"><strong>Email:</strong> ${quote.sender_email}</p>
-                <p style="margin: 5px 0;"><strong>Phone:</strong> ${quote.sender_phone}</p>
-                <p style="margin: 5px 0;"><strong>Address:</strong> ${quote.sender_address}, ${quote.sender_city}, ${quote.sender_state}, ${quote.sender_country}</p>
+                <h5 style="margin-top: 0; color: #333;">${trans.fromSender}</h5>
+                <p style="margin: 5px 0;"><strong>${trans.name}:</strong> ${quote.sender_first_name} ${quote.sender_last_name}</p>
+                ${quote.sender_company ? `<p style="margin: 5px 0;"><strong>${trans.company}:</strong> ${quote.sender_company}</p>` : ''}
+                <p style="margin: 5px 0;"><strong>${trans.email.replace('...', '')}:</strong> ${quote.sender_email}</p>
+                <p style="margin: 5px 0;"><strong>${trans.phone}:</strong> ${quote.sender_phone}</p>
+                <p style="margin: 5px 0;"><strong>${trans.address}:</strong> ${quote.sender_address}, ${quote.sender_city}, ${quote.sender_state}, ${quote.sender_country}</p>
             </div>
             
             <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                <h5 style="margin-top: 0; color: #333;">To (Receiver)</h5>
-                <p style="margin: 5px 0;"><strong>Name:</strong> ${quote.receiver_first_name} ${quote.receiver_last_name}</p>
-                ${quote.receiver_company ? `<p style="margin: 5px 0;"><strong>Company:</strong> ${quote.receiver_company}</p>` : ''}
-                <p style="margin: 5px 0;"><strong>Email:</strong> ${quote.receiver_email}</p>
-                <p style="margin: 5px 0;"><strong>Phone:</strong> ${quote.receiver_phone}</p>
-                <p style="margin: 5px 0;"><strong>Address:</strong> ${quote.receiver_address}, ${quote.receiver_city}, ${quote.receiver_state}, ${quote.receiver_country}</p>
+                <h5 style="margin-top: 0; color: #333;">${trans.toReceiver}</h5>
+                <p style="margin: 5px 0;"><strong>${trans.name}:</strong> ${quote.receiver_first_name} ${quote.receiver_last_name}</p>
+                ${quote.receiver_company ? `<p style="margin: 5px 0;"><strong>${trans.company}:</strong> ${quote.receiver_company}</p>` : ''}
+                <p style="margin: 5px 0;"><strong>${trans.email.replace('...', '')}:</strong> ${quote.receiver_email}</p>
+                <p style="margin: 5px 0;"><strong>${trans.phone}:</strong> ${quote.receiver_phone}</p>
+                <p style="margin: 5px 0;"><strong>${trans.address}:</strong> ${quote.receiver_address}, ${quote.receiver_city}, ${quote.receiver_state}, ${quote.receiver_country}</p>
             </div>
             
             <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                <h5 style="margin-top: 0; color: #333;">Package Information</h5>
-                <p style="margin: 5px 0;"><strong>Type:</strong> ${quote.shipment_type}</p>
-                <p style="margin: 5px 0;"><strong>Service:</strong> ${quote.service_type}</p>
-                <p style="margin: 5px 0;"><strong>Weight:</strong> ${quote.weight} kg</p>
+                <h5 style="margin-top: 0; color: #333;">${trans.packageInfo}</h5>
+                <p style="margin: 5px 0;"><strong>${trans.type}:</strong> ${quote.shipment_type}</p>
+                <p style="margin: 5px 0;"><strong>${trans.service}:</strong> ${quote.service_type}</p>
+                <p style="margin: 5px 0;"><strong>${trans.weight}:</strong> ${quote.weight} kg</p>
                 ${quote.length && quote.width && quote.height ? 
-                    `<p style="margin: 5px 0;"><strong>Dimensions:</strong> ${quote.length} × ${quote.width} × ${quote.height} cm</p>` : ''}
-                <p style="margin: 5px 0;"><strong>Quantity:</strong> ${quote.quantity} package(s)</p>
-                ${quote.declared_value ? `<p style="margin: 5px 0;"><strong>Declared Value:</strong> $${quote.declared_value}</p>` : ''}
-                <p style="margin: 5px 0;"><strong>Insurance:</strong> ${quote.insurance ? 'Yes' : 'No'}</p>
-                <p style="margin: 5px 0;"><strong>Description:</strong> ${quote.description}</p>
-                ${quote.special_instructions ? `<p style="margin: 5px 0;"><strong>Special Instructions:</strong> ${quote.special_instructions}</p>` : ''}
+                    `<p style="margin: 5px 0;"><strong>${trans.dimensions}:</strong> ${quote.length} × ${quote.width} × ${quote.height} cm</p>` : ''}
+                <p style="margin: 5px 0;"><strong>${trans.quantity}:</strong> ${quote.quantity} package(s)</p>
+                ${quote.declared_value ? `<p style="margin: 5px 0;"><strong>${trans.declaredValue}:</strong> $${quote.declared_value}</p>` : ''}
+                <p style="margin: 5px 0;"><strong>${trans.insurance}:</strong> ${quote.insurance ? trans.yes : trans.no}</p>
+                <p style="margin: 5px 0;"><strong>${trans.description}:</strong> ${quote.description}</p>
+                ${quote.special_instructions ? `<p style="margin: 5px 0;"><strong>${trans.specialInstructions}:</strong> ${quote.special_instructions}</p>` : ''}
             </div>
         </div>
     `;
@@ -354,8 +362,261 @@ const viewQuoteDetails = (quote) => {
         html: details,
         width: '700px',
         confirmButtonColor: '#e03e2d',
-        confirmButtonText: 'Close'
+        confirmButtonText: trans.close
     });
+};
+
+const downloadPDF = async (quote) => {
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        
+        // Colors
+        const primaryColor = [224, 62, 45]; // #e03e2d
+        const darkGray = [51, 51, 51];
+        const lightGray = [245, 245, 245];
+        const mediumGray = [128, 128, 128];
+        
+        // Header Background
+        doc.setFillColor(...primaryColor);
+        doc.rect(0, 0, pageWidth, 45, 'F');
+        
+        // Company Logo/Name
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(24);
+        doc.setFont('helvetica', 'bold');
+        doc.text('LOGISTICS', 15, 20);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text('International Shipping Solutions', 15, 28);
+        
+        // Document Title
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.text('SHIPPING QUOTE', pageWidth - 15, 20, { align: 'right' });
+        
+        // Quote Info Box (Top Right)
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Quote #: ${quote.id.substring(0, 8).toUpperCase()}`, pageWidth - 15, 28, { align: 'right' });
+        doc.text(`Date: ${new Date(quote.date_created).toLocaleDateString()}`, pageWidth - 15, 33, { align: 'right' });
+        doc.text(`Status: ${quote.status.toUpperCase()}`, pageWidth - 15, 38, { align: 'right' });
+        
+        let yPos = 55;
+        
+        // Sender & Receiver Section
+        doc.setFillColor(...lightGray);
+        doc.rect(15, yPos, pageWidth - 30, 50, 'F');
+        
+        // Sender Info (Left Column)
+        doc.setTextColor(...primaryColor);
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text('FROM (SENDER)', 20, yPos + 8);
+        
+        doc.setTextColor(...darkGray);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        let senderY = yPos + 15;
+        doc.text(`${quote.sender_first_name} ${quote.sender_last_name}`, 20, senderY);
+        if (quote.sender_company) {
+            senderY += 5;
+            doc.setFont('helvetica', 'italic');
+            doc.text(quote.sender_company, 20, senderY);
+            doc.setFont('helvetica', 'normal');
+        }
+        senderY += 5;
+        doc.text(quote.sender_email, 20, senderY);
+        senderY += 5;
+        doc.text(quote.sender_phone, 20, senderY);
+        senderY += 5;
+        const senderAddr = doc.splitTextToSize(`${quote.sender_address}, ${quote.sender_city}, ${quote.sender_state}, ${quote.sender_country}`, 80);
+        doc.text(senderAddr, 20, senderY);
+        
+        // Receiver Info (Right Column)
+        doc.setTextColor(...primaryColor);
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text('TO (RECEIVER)', pageWidth / 2 + 5, yPos + 8);
+        
+        doc.setTextColor(...darkGray);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        let receiverY = yPos + 15;
+        doc.text(`${quote.receiver_first_name} ${quote.receiver_last_name}`, pageWidth / 2 + 5, receiverY);
+        if (quote.receiver_company) {
+            receiverY += 5;
+            doc.setFont('helvetica', 'italic');
+            doc.text(quote.receiver_company, pageWidth / 2 + 5, receiverY);
+            doc.setFont('helvetica', 'normal');
+        }
+        receiverY += 5;
+        doc.text(quote.receiver_email, pageWidth / 2 + 5, receiverY);
+        receiverY += 5;
+        doc.text(quote.receiver_phone, pageWidth / 2 + 5, receiverY);
+        receiverY += 5;
+        const receiverAddr = doc.splitTextToSize(`${quote.receiver_address}, ${quote.receiver_city}, ${quote.receiver_state}, ${quote.receiver_country}`, 80);
+        doc.text(receiverAddr, pageWidth / 2 + 5, receiverY);
+        
+        yPos += 60;
+        
+        // Shipment Details Section Header
+        doc.setTextColor(...primaryColor);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text('SHIPMENT DETAILS', 15, yPos);
+        yPos += 3;
+        
+        // Shipment Details Table
+        const shipmentData = [
+            ['Shipment Type', quote.shipment_type],
+            ['Service Type', quote.service_type],
+            ['Weight', `${quote.weight} kg`],
+            ['Quantity', `${quote.quantity} package(s)`]
+        ];
+        
+        if (quote.length && quote.width && quote.height) {
+            shipmentData.push(['Dimensions (L × W × H)', `${quote.length} × ${quote.width} × ${quote.height} cm`]);
+        }
+        
+        if (quote.declared_value) {
+            shipmentData.push(['Declared Value', `$${quote.declared_value}`]);
+        }
+        
+        shipmentData.push(['Insurance', quote.insurance ? 'Yes' : 'No']);
+        
+        doc.autoTable({
+            startY: yPos + 2,
+            head: [['Item', 'Details']],
+            body: shipmentData,
+            theme: 'striped',
+            headStyles: {
+                fillColor: primaryColor,
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                fontSize: 10
+            },
+            bodyStyles: {
+                fontSize: 9,
+                textColor: darkGray
+            },
+            alternateRowStyles: {
+                fillColor: [250, 250, 250]
+            },
+            columnStyles: {
+                0: { cellWidth: 60, fontStyle: 'bold' },
+                1: { cellWidth: 'auto' }
+            },
+            margin: { left: 15, right: 15 }
+        });
+        
+        yPos = doc.lastAutoTable.finalY + 10;
+        
+        // Package Description Section
+        if (quote.description || quote.special_instructions) {
+            doc.setTextColor(...primaryColor);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('PACKAGE DESCRIPTION', 15, yPos);
+            yPos += 3;
+            
+            const descriptionData = [];
+            if (quote.description) {
+                descriptionData.push(['Description', quote.description]);
+            }
+            if (quote.special_instructions) {
+                descriptionData.push(['Special Instructions', quote.special_instructions]);
+            }
+            
+            doc.autoTable({
+                startY: yPos + 2,
+                body: descriptionData,
+                theme: 'plain',
+                bodyStyles: {
+                    fontSize: 9,
+                    textColor: darkGray,
+                    cellPadding: 5
+                },
+                columnStyles: {
+                    0: { cellWidth: 60, fontStyle: 'bold', fillColor: lightGray },
+                    1: { cellWidth: 'auto' }
+                },
+                margin: { left: 15, right: 15 }
+            });
+            
+            yPos = doc.lastAutoTable.finalY + 10;
+        }
+        
+        // Terms and Conditions Box
+        if (yPos > pageHeight - 50) {
+            doc.addPage();
+            yPos = 20;
+        }
+        
+        doc.setFillColor(250, 250, 250);
+        doc.rect(15, yPos, pageWidth - 30, 30, 'F');
+        doc.setDrawColor(...mediumGray);
+        doc.setLineWidth(0.5);
+        doc.rect(15, yPos, pageWidth - 30, 30);
+        
+        doc.setTextColor(...mediumGray);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.text('TERMS & CONDITIONS', 20, yPos + 6);
+        
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7);
+        const terms = [
+            '• This quote is valid for 30 days from the date of issue.',
+            '• Rates are subject to change based on fuel surcharges and market conditions.',
+            '• Customer is responsible for accurate declaration of goods and compliance with customs regulations.',
+            '• Insurance coverage is optional and recommended for high-value shipments.'
+        ];
+        let termsY = yPos + 12;
+        terms.forEach(term => {
+            doc.text(term, 20, termsY);
+            termsY += 4;
+        });
+        
+        // Footer
+        const footerY = pageHeight - 15;
+        doc.setDrawColor(...primaryColor);
+        doc.setLineWidth(1);
+        doc.line(15, footerY - 5, pageWidth - 15, footerY - 5);
+        
+        doc.setTextColor(...mediumGray);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Thank you for choosing our logistics services!', pageWidth / 2, footerY, { align: 'center' });
+        
+        doc.setFontSize(7);
+        doc.text(`Generated on ${new Date().toLocaleDateString()} | Document ID: ${quote.id.substring(0, 8)}`, pageWidth / 2, footerY + 5, { align: 'center' });
+        
+        // Page numbers
+        doc.setFontSize(7);
+        doc.text(`Page 1 of 1`, pageWidth - 20, footerY + 5, { align: 'right' });
+        
+        // Save the PDF
+        doc.save(`Shipment_Quote_${quote.id.substring(0, 8)}.pdf`);
+        
+        Swal.fire({
+            title: t.value.success,
+            text: 'PDF downloaded successfully!',
+            icon: 'success',
+            confirmButtonColor: '#e03e2d',
+            timer: 2000
+        });
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        Swal.fire({
+            title: t.value.error,
+            text: 'Failed to generate PDF. Please make sure jsPDF library is loaded.',
+            icon: 'error',
+            confirmButtonColor: '#e03e2d'
+        });
+    }
 };
 
 const updateProfile = async () => {
@@ -747,6 +1008,7 @@ const handleLogout = async () => {
 .quote-actions {
     display: flex;
     justify-content: flex-end;
+    gap: 10px;
     padding-top: 15px;
     border-top: 1px solid #e5e7eb;
 }
@@ -773,6 +1035,31 @@ const handleLogout = async () => {
 }
 
 .btn-view-details i {
+    font-size: 16px;
+}
+
+.btn-download-pdf {
+    background: #10b981;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-download-pdf:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.btn-download-pdf i {
     font-size: 16px;
 }
 
