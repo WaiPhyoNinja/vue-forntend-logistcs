@@ -159,7 +159,10 @@ export function useAuth() {
   // Get current user
   const getCurrentUser = async () => {
     try {
-      if (!token.value) return null;
+      if (!token.value) {
+        user.value = null;
+        return null;
+      }
       
       const response = await fetch('http://0.0.0.0:8055/users/me', {
         method: 'GET',
@@ -168,6 +171,15 @@ export function useAuth() {
           'Content-Type': 'application/json',
         }
       });
+
+      // If 403 or 401, token is invalid - clear it silently
+      if (response.status === 403 || response.status === 401) {
+        user.value = null;
+        token.value = null;
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_refresh_token');
+        return null;
+      }
 
       const data = await response.json();
       
@@ -179,7 +191,10 @@ export function useAuth() {
         return null;
       }
     } catch (error) {
-      console.error('Get user error:', error);
+      // Don't log 403/401 errors as they're expected when not logged in
+      if (error.response?.status !== 403 && error.response?.status !== 401) {
+        console.error('Get user error:', error);
+      }
       user.value = null;
       return null;
     }

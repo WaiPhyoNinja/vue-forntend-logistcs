@@ -27,6 +27,7 @@ const blockComponents = {
   'block_processflow': defineAsyncComponent(() => import('./blocks/ProcessFlow.vue')),
   'block_branded': defineAsyncComponent(() => import('./blocks/Branded.vue')),
   'block_masthead': defineAsyncComponent(() => import('./blocks/MastheadBlock.vue')),
+  'block_header': defineAsyncComponent(() => import('./blocks/PageMasthead.vue')),
   'block_hero': defineAsyncComponent(() => import('./blocks/HeroBlock.vue')),
   'block_features': defineAsyncComponent(() => import('./blocks/FeaturesBlock.vue')),
   'block_content': defineAsyncComponent(() => import('./blocks/ContentBlock.vue')),
