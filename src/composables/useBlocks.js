@@ -66,6 +66,11 @@ export function useBlocks() {
             if (block.collection === 'block_services') {
               fields = ['*', 'translations.*', 'services.services_id.*', 'services.services_id.translations.*'];
             }
+            
+            // For block_contact_card, fetch card items with nested translations
+            if (block.collection === 'block_contact_card') {
+              fields = ['*', 'card.*', 'card.contact_card_id.*', 'card.contact_card_id.translations.*'];
+            }
             const blockData = await directus.request(
               readItems(block.collection, {
                 fields: fields,

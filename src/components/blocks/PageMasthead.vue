@@ -10,7 +10,7 @@
                 <div class="page-header__shape-1 float-bob-y" v-if="animationImageUrl">
                     <img :src="animationImageUrl" alt="">
                 </div>
-                <h3>{{ pageTitle }}</h3>
+                <h3 :style="titleStyle">{{ pageTitle }}</h3>
                 <div class="thm-breadcrumb__inner">
                     <ul class="thm-breadcrumb list-unstyled">
                         <li v-for="(link, index) in breadcrumbLinks" :key="index">
@@ -26,28 +26,33 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { computed } from 'vue';
 import { useLanguage } from '@/composables/useLanguage';
 
-const { currentLanguage } = useLanguage();
+const props = defineProps({
+    data: {
+        type: Object,
+        required: false,
+        default: () => ({})
+    }
+});
 
-const headerData = ref(null);
-const loading = ref(false);
+const { currentLanguage } = useLanguage();
 
 const directusUrl = 'http://0.0.0.0:8055';
 
 // Computed properties for current language translation
 const currentTranslation = computed(() => {
-    if (!headerData.value?.translations) return null;
-    return headerData.value.translations.find(
+    if (!props.data?.translations) return null;
+    return props.data.translations.find(
         t => t.languages_code === currentLanguage.value
-    ) || headerData.value.translations.find(
+    ) || props.data.translations.find(
         t => t.languages_code === 'en-US'
     );
 });
 
 const pageTitle = computed(() => {
-    return currentTranslation.value?.title || 'Page Title';
+    return currentTranslation.value?.title || props.data?.title || 'Page';
 });
 
 const breadcrumbLinks = computed(() => {
@@ -62,63 +67,32 @@ const breadcrumbLinks = computed(() => {
 });
 
 const headerImageUrl = computed(() => {
-    if (headerData.value?.header_image) {
-        return `${directusUrl}/assets/${headerData.value.header_image}`;
+    if (props.data?.header_image) {
+        return `${directusUrl}/assets/${props.data.header_image}`;
     }
-    return 'assets/images/backgrounds/page-header-bg.jpg';
+    return '/assets/images/resources/page-header-img-1.png';
 });
 
 const backgroundImageUrl = computed(() => {
-    if (headerData.value?.header_bg_image) {
-        return `${directusUrl}/assets/${headerData.value.header_bg_image}`;
+    if (props.data?.header_bg_image) {
+        return `${directusUrl}/assets/${props.data.header_bg_image}`;
     }
-    return 'assets/images/backgrounds/page-header-bg.jpg';
+    return '/assets/images/backgrounds/page-header-bg.jpg';
 });
 
-
 const animationImageUrl = computed(() => {
-    if (headerData.value?.animation_image) {
-        return `${directusUrl}/assets/${headerData.value.animation_image}`;
+    if (props.data?.animation_image) {
+        return `${directusUrl}/assets/${props.data.animation_image}`;
     }
     return null;
 });
 
-const fetchHeaderData = async () => {
-    loading.value = true;
-    try {
-        console.log('Fetching header data from:', `${directusUrl}/items/block_header`);
-        
-        // Try using direct fetch for public access
-        const response = await fetch(`${directusUrl}/items/block_header?fields=*,translations.*`);
-        
-        console.log('Response status:', response.status);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('API Response:', data);
-
-        if (data.data && data.data.length > 0) {
-            headerData.value = data.data[0];
-            console.log('Page header data loaded:', headerData.value);
-            console.log('Current translation:', currentTranslation.value);
-        } else {
-            console.warn('No header data found in API response');
-        }
-    } catch (error) {
-        console.error('Error fetching header data:', error);
-        console.warn('Component will use default fallback values');
-    } finally {
-        loading.value = false;
-        console.log('Header loading complete. headerData:', headerData.value);
-        console.log('Page Title:', pageTitle.value);
-        console.log('Breadcrumbs:', breadcrumbLinks.value);
+const titleStyle = computed(() => {
+    // Smaller font size for Myanmar and Thai languages
+    if (currentLanguage.value === 'mm' || currentLanguage.value === 'th') {
+        return { fontSize: '36px' };
     }
-};
-
-onMounted(() => {
-    fetchHeaderData();
+    // Default size for English
+    return { fontSize: '42px' };
 });
 </script>

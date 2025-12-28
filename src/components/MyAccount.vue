@@ -296,21 +296,49 @@ const fetchQuoteRequests = async () => {
             return;
         }
 
-        const response = await directus.request(
+        console.log('Fetching quotes for user:', user.value.id, user.value.email);
+
+        // First try: Filter by user_created on server
+        let response = await directus.request(
             readItems('quote_requests', {
-                filter: {
-                    user_created: {
-                        _eq: user.value.id
-                    }
-                },
+                // filter: {
+                //     user_created: {
+                //         _eq: user.value.id
+                //     }
+                // },
                 sort: ['-date_created'],
                 limit: 50
             })
         );
-        quoteRequests.value = response;
-        console.log('Quote requests loaded for user:', user.value.id, response);
+
+        console.log('Server filter (user_created) result:', response?.length || 0, 'quotes');
+
+        // Fallback: If no results, try fetching all and filter by email client-side
+        if ((!response || response.length === 0) && user.value.email) {
+            console.log('No results with user_created filter, trying email fallback...');
+            
+            const allQuotes = await directus.request(
+                readItems('quote_requests', {
+                    sort: ['-date_created'],
+                    limit: 100
+                })
+            );
+
+            console.log('Total quotes in system:', allQuotes?.length || 0);
+
+            if (allQuotes && allQuotes.length > 0) {
+                response = allQuotes.filter(quote => 
+                    quote.sender_email?.toLowerCase().trim() === user.value.email?.toLowerCase().trim()
+                );
+                console.log('Email filter result:', response.length, 'quotes');
+            }
+        }
+
+        quoteRequests.value = response || [];
+        console.log('Final quotes displayed:', quoteRequests.value.length);
     } catch (error) {
         console.error('Error fetching quote requests:', error);
+        quoteRequests.value = [];
         if (error.response?.status !== 403) {
             Swal.fire({
                 title: 'Error',
