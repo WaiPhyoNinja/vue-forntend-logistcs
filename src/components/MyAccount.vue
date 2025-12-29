@@ -298,18 +298,36 @@ const fetchQuoteRequests = async () => {
 
         console.log('Fetching quotes for user:', user.value.id, user.value.email);
 
-        // First try: Filter by user_created on server
-        let response = await directus.request(
-            readItems('quote_requests', {
-                // filter: {
-                //     user_created: {
-                //         _eq: user.value.id
-                //     }
-                // },
-                sort: ['-date_created'],
-                limit: 50
-            })
-        );
+        // Get authentication token
+        const authToken = localStorage.getItem('auth_token');
+        
+        // First try: Filter by user_created on server with authenticated request
+        const filterQuery = {
+            filter: {
+                user_created: {
+                    _eq: user.value.id
+                }
+            },
+            sort: ['-date_created'],
+            limit: 50
+        };
+        
+        const queryParams = new URLSearchParams({
+            filter: JSON.stringify(filterQuery.filter),
+            sort: filterQuery.sort.join(','),
+            limit: filterQuery.limit.toString()
+        });
+        
+        const fetchResponse = await fetch(`http://0.0.0.0:8055/items/quote_requests?${queryParams}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        const responseData = await fetchResponse.json();
+        let response = responseData.data || [];
 
         console.log('Server filter (user_created) result:', response?.length || 0, 'quotes');
 
@@ -317,12 +335,16 @@ const fetchQuoteRequests = async () => {
         if ((!response || response.length === 0) && user.value.email) {
             console.log('No results with user_created filter, trying email fallback...');
             
-            const allQuotes = await directus.request(
-                readItems('quote_requests', {
-                    sort: ['-date_created'],
-                    limit: 100
-                })
-            );
+            const allQuotesResponse = await fetch(`http://0.0.0.0:8055/items/quote_requests?sort=-date_created&limit=100`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            const allQuotesData = await allQuotesResponse.json();
+            const allQuotes = allQuotesData.data || [];
 
             console.log('Total quotes in system:', allQuotes?.length || 0);
 

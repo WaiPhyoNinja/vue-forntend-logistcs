@@ -705,15 +705,54 @@ const handleSubmit = async () => {
             status: 'pending'
         }
 
-        console.log('Submitting quote request to Directus:', quoteData)
+        // Add user tracking fields
+        if (editQuoteId.value) {
+            // For updates, add user_updated
+            if (user.value?.id) {
+                quoteData.user_updated = user.value.id
+            }
+        } else {
+            // For new quotes, add user_created
+            if (user.value?.id) {
+                quoteData.user_created = user.value.id
+            }
+        }
 
-        // Submit to Directus (create or update)
+        console.log('Submitting quote request to Directus:', quoteData)
+        console.log('User ID:', user.value?.id)
+        console.log('Is editing:', !!editQuoteId.value)
+        console.log('user_created in quoteData:', quoteData.user_created)
+        console.log('user_updated in quoteData:', quoteData.user_updated)
+
+        // Get authentication token
+        const authToken = localStorage.getItem('auth_token')
+        console.log('Auth token exists:', !!authToken)
+
+        // Submit to Directus (create or update) with authentication
         let result
         if (editQuoteId.value) {
-            result = await directus.request(updateItem('quote_requests', editQuoteId.value, quoteData))
+            // Use authenticated request for update
+            const response = await fetch(`http://0.0.0.0:8055/items/quote_requests/${editQuoteId.value}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(quoteData)
+            })
+            result = await response.json()
             console.log('Quote request updated successfully:', result)
         } else {
-            result = await directus.request(createItem('quote_requests', quoteData))
+            // Use authenticated request for create
+            const response = await fetch('http://0.0.0.0:8055/items/quote_requests', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(quoteData)
+            })
+            result = await response.json()
             console.log('Quote request created successfully:', result)
         }
 
