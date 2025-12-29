@@ -4,6 +4,7 @@ import Login from '../components/auth/Login.vue'
 import MyAccount from '../components/MyAccount.vue'
 import ResetPassword from '../components/ResetPassword.vue'
 import RequestQuote from '../components/RequestQuote.vue'
+import NotFound from '../components/NotFound.vue'
 import { useAuth } from '@/composables/useAuth'
 
 const routes = [
@@ -67,6 +68,11 @@ const routes = [
     path: '/:parent/:child/:slug',
     name: 'DeepNestedPage',
     component: Index
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: NotFound
   }
 ]
 
