@@ -100,7 +100,7 @@
                                 </div>
                                 
                                 <div v-else class="quotes-list">
-                                    <div v-for="quote in quoteRequests" :key="quote.id" class="quote-item">
+                                    <div v-for="quote in paginatedQuotes" :key="quote.id" class="quote-item">
                                         <div class="quote-header">
                                             <div class="quote-id">
                                                 <strong>Quote #{{ quote.id.substring(0, 8) }}</strong>
@@ -174,6 +174,43 @@
                                                 </button>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Pagination -->
+                                <div v-if="quoteRequests.length > itemsPerPage" class="pagination-container">
+                                    <div class="pagination">
+                                        <button 
+                                            @click="goToPage(currentPage - 1)" 
+                                            :disabled="currentPage === 1"
+                                            class="pagination-btn"
+                                        >
+                                            <i class="fas fa-chevron-left"></i>
+                                            Previous
+                                        </button>
+                                        
+                                        <div class="pagination-numbers">
+                                            <button
+                                                v-for="page in totalPages"
+                                                :key="page"
+                                                @click="goToPage(page)"
+                                                :class="['pagination-number', { active: currentPage === page }]"
+                                            >
+                                                {{ page }}
+                                            </button>
+                                        </div>
+                                        
+                                        <button 
+                                            @click="goToPage(currentPage + 1)" 
+                                            :disabled="currentPage === totalPages"
+                                            class="pagination-btn"
+                                        >
+                                            Next
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                    <div class="pagination-info">
+                                        Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ Math.min(currentPage * itemsPerPage, quoteRequests.length) }} of {{ quoteRequests.length }} quotes
                                     </div>
                                 </div>
                             </div>
@@ -261,6 +298,8 @@ const isUpdating = ref(false);
 const orders = ref([]);
 const quoteRequests = ref([]);
 const loadingQuotes = ref(false);
+const currentPage = ref(1);
+const itemsPerPage = 5;
 
 const profileData = ref({
     first_name: '',
@@ -273,6 +312,21 @@ const passwordData = ref({
     new: '',
     confirm: ''
 });
+
+// Pagination computed properties
+const totalPages = computed(() => Math.ceil(quoteRequests.value.length / itemsPerPage));
+const paginatedQuotes = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return quoteRequests.value.slice(start, end);
+});
+
+const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages.value) {
+        currentPage.value = page;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
 
 onMounted(async () => {
     if (user.value) {
@@ -358,6 +412,9 @@ const fetchQuoteRequests = async () => {
 
         quoteRequests.value = response || [];
         console.log('Final quotes displayed:', quoteRequests.value.length);
+        
+        // Reset to first page when data changes
+        currentPage.value = 1;
     } catch (error) {
         console.error('Error fetching quote requests:', error);
         quoteRequests.value = [];
@@ -1592,6 +1649,84 @@ const handleLogout = async () => {
     font-size: 16px;
 }
 
+/* Pagination Styles */
+.pagination-container {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #f0f0f0;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.pagination-btn {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background: #f9fafb;
+    border-color: #e03e2d;
+    color: #e03e2d;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-numbers {
+    display: flex;
+    gap: 5px;
+}
+
+.pagination-number {
+    min-width: 40px;
+    height: 40px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    color: #374151;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.pagination-number:hover {
+    background: #f9fafb;
+    border-color: #e03e2d;
+    color: #e03e2d;
+}
+
+.pagination-number.active {
+    background: #e03e2d;
+    border-color: #e03e2d;
+    color: #fff;
+}
+
+.pagination-info {
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+}
+
 @media (max-width: 768px) {
     .quote-route {
         flex-direction: column;
@@ -1610,6 +1745,25 @@ const handleLogout = async () => {
         flex-direction: column;
         gap: 10px;
         align-items: flex-start;
+    }
+    
+    .pagination {
+        flex-wrap: wrap;
+    }
+    
+    .pagination-btn {
+        padding: 8px 15px;
+        font-size: 13px;
+    }
+    
+    .pagination-number {
+        min-width: 35px;
+        height: 35px;
+        font-size: 13px;
+    }
+    
+    .pagination-info {
+        font-size: 12px;
     }
 }
 </style>
