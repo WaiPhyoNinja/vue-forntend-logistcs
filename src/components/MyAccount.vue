@@ -1765,5 +1765,286 @@ const handleLogout = async () => {
     .pagination-info {
         font-size: 12px;
     }
+    
+    /* Mobile-specific quote card improvements */
+    .my-account-section {
+        padding: 40px 0;
+    }
+    
+    .account-content-box {
+        padding: 20px;
+    }
+    
+    .account-content-box h3 {
+        font-size: 22px;
+    }
+    
+    .quote-item {
+        margin-bottom: 15px;
+    }
+    
+    .quote-header {
+        padding: 12px 15px;
+    }
+    
+    .quote-id strong {
+        font-size: 14px;
+    }
+    
+    .status-badge {
+        font-size: 11px;
+        padding: 3px 10px;
+    }
+    
+    .quote-date {
+        font-size: 12px;
+    }
+    
+    .quote-details {
+        padding: 15px;
+    }
+    
+    .quote-route {
+        padding: 12px;
+        margin-bottom: 15px;
+    }
+    
+    .route-info strong {
+        font-size: 11px;
+    }
+    
+    .route-info p {
+        font-size: 13px;
+    }
+    
+    .info-item {
+        padding: 8px;
+    }
+    
+    .info-item i {
+        font-size: 16px;
+    }
+    
+    .info-item span {
+        font-size: 12px;
+    }
+    
+    .quote-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .btn-view-details,
+    .btn-edit-quote,
+    .btn-download-pdf {
+        width: 100%;
+        justify-content: center;
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+    
+    .account-sidebar {
+        margin-bottom: 30px;
+    }
+    
+    .pagination-container {
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .my-account-section {
+        padding: 30px 0;
+    }
+    
+    .account-content-box {
+        padding: 15px;
+    }
+    
+    .account-content-box h3 {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .quote-requests-section h4 {
+        font-size: 16px !important;
+        margin-bottom: 15px !important;
+    }
+    
+    .quote-item {
+        border-radius: 8px;
+    }
+    
+    .quote-header {
+        padding: 10px 12px;
+    }
+    
+    .quote-id {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        width: 100%;
+    }
+    
+    .quote-id strong {
+        font-size: 13px;
+    }
+    
+    .status-badge {
+        font-size: 10px;
+        padding: 2px 8px;
+    }
+    
+    .quote-date {
+        font-size: 11px;
+        margin-top: 5px;
+    }
+    
+    .quote-details {
+        padding: 12px;
+    }
+    
+    .quote-route {
+        padding: 10px;
+        margin-bottom: 12px;
+    }
+    
+    .route-info {
+        gap: 8px;
+    }
+    
+    .route-info i {
+        font-size: 16px;
+    }
+    
+    .route-info strong {
+        font-size: 10px;
+    }
+    
+    .route-info p {
+        font-size: 12px;
+    }
+    
+    .route-arrow {
+        font-size: 16px;
+        padding: 5px 0;
+    }
+    
+    .quote-info-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .info-item {
+        padding: 8px 6px;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 5px;
+    }
+    
+    .info-item i {
+        font-size: 14px;
+    }
+    
+    .info-item span {
+        font-size: 11px;
+        line-height: 1.3;
+    }
+    
+    .quote-actions {
+        padding-top: 12px;
+        gap: 6px;
+    }
+    
+    .btn-view-details,
+    .btn-edit-quote,
+    .btn-download-pdf {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+    
+    .btn-view-details i,
+    .btn-edit-quote i,
+    .btn-download-pdf i {
+        font-size: 14px;
+    }
+    
+    .pagination {
+        gap: 5px;
+    }
+    
+    .pagination-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    .pagination-btn i {
+        font-size: 10px;
+    }
+    
+    .pagination-numbers {
+        gap: 3px;
+    }
+    
+    .pagination-number {
+        min-width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+    
+    .pagination-info {
+        font-size: 11px;
+        padding: 0 10px;
+        line-height: 1.4;
+    }
+    
+    .empty-state {
+        padding: 40px 15px;
+    }
+    
+    .empty-state i {
+        font-size: 40px !important;
+    }
+    
+    .empty-state p {
+        font-size: 14px;
+    }
+    
+    .loading-state i {
+        font-size: 30px !important;
+    }
+    
+    .loading-state p {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 390px) {
+    .quote-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-item {
+        flex-direction: row;
+        justify-content: flex-start;
+        text-align: left;
+    }
+    
+    .pagination-numbers {
+        display: flex;
+        overflow-x: auto;
+        max-width: 100%;
+        padding: 2px;
+    }
+    
+    .pagination-btn span {
+        display: none;
+    }
+    
+    .pagination-btn i {
+        margin: 0;
+    }
 }
 </style>
