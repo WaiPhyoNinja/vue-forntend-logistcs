@@ -5,6 +5,7 @@ import MyAccount from '../components/MyAccount.vue'
 import ResetPassword from '../components/ResetPassword.vue'
 import RequestQuote from '../components/RequestQuote.vue'
 import NotFound from '../components/NotFound.vue'
+import ServiceDetails from '../components/ServiceDetails.vue'
 import { useAuth } from '@/composables/useAuth'
 
 const routes = [
@@ -53,6 +54,11 @@ const routes = [
     name: 'Orders',
     component: Index,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/services/:slug',
+    name: 'ServiceDetails',
+    component: ServiceDetails
   },
   {
     path: '/:slug',
