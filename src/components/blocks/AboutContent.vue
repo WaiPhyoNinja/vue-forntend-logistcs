@@ -10,8 +10,7 @@
                         </div>
                         <div class="about-one__circle-text">
                             <div class="about-one__round-text-box">
-                                <div class="inner">
-                                    <div class="about-one__curved-circle rotate-me" v-html="animationText"></div>
+                                <div class="inner" v-html="curvedCircleHTML">
                                 </div>
                                 <div class="overlay-icon-box">
                                     <a :href="translation?.link || '#'"><i class="icon-plane"></i></a>
@@ -110,6 +109,31 @@ const animationText = computed(() => {
     return translation.value?.animation_text || 'Welcome To Our Company Property since 2018';
 });
 
+const curvedCircleHTML = computed(() => {
+    const text = animationText.value;
+    if (!text) return '';
+    
+    const chars = text.split('');
+    const totalChars = chars.length;
+    const radius = 7.33333; // in em units
+    const startAngle = -170.501; // starting rotation in degrees
+    const angleIncrement = 360 / totalChars; // distribute evenly around circle
+    
+    let html = '<div class="about-one__curved-circle rotate-me" style="position: absolute; height: 175.033px;">';
+    
+    chars.forEach((char, index) => {
+        const rotation = startAngle + (index * angleIncrement);
+        const charWidth = char === ' ' ? 0.208333 : (char.match(/[A-Z]/i) ? 0.375 : 0.333333);
+        const marginLeft = -charWidth;
+        const displayChar = char === ' ' ? '&nbsp;' : char;
+        
+        html += `<span class="char${index + 1}" style="position: absolute; left: 50%; margin-left: ${marginLeft}em; transform: rotate(${rotation}deg); transform-origin: center ${radius}em;">${displayChar}</span>`;
+    });
+    
+    html += '</div>';
+    return html;
+});
+
 const fetchAboutContent = async () => {
     try {
         loading.value = true;
@@ -125,10 +149,6 @@ const fetchAboutContent = async () => {
         loading.value = false;
     }
 };
-
-onMounted(() => {
-    fetchAboutContent();
-});
 
 onMounted(() => {
     fetchAboutContent();
