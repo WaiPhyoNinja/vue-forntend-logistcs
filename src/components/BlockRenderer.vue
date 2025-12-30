@@ -20,6 +20,7 @@ const props = defineProps({
 
 // Dynamically import block components
 const blockComponents = {
+  'block_service_image': defineAsyncComponent(() => import('./blocks/ServiceImage.vue')),
   'block_about_us': defineAsyncComponent(() => import('./blocks/AboutContent.vue')),
   'block_map_content': defineAsyncComponent(() => import('./blocks/MapContact.vue')),
   'block_info': defineAsyncComponent(() => import('./blocks/Info.vue')),
