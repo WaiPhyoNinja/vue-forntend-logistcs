@@ -8,10 +8,10 @@
             <div class="container">
                 <div class="page-header__inner">
                     <div class="page-header__img-1">
-                        <img src="https://dreamlayout.mnsithub.com/php/tanspotphp/assets/images/resources/page-header-img-1.png" alt="">
+                        <img src="/src/assets/img/page-header-img-1.png" alt="">
                     </div>
                     <div class="page-header__shape-1 float-bob-y">
-                        <img :src={./src/asserts/img/shapes/banner-one-shape-3.png} alt="">
+                        <img src="/src/assets/img/shapes/banner-one-shape-3.png" alt="">
                     </div>
                     <h3 :style="titleStyle">{{ translation?.title }}</h3>
                     <div class="thm-breadcrumb__inner">
