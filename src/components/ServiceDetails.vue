@@ -1,89 +1,123 @@
 <template>
     <div class="page-wrapper">
-       <Header />
-    <section class="service-details" v-if="service">
-        <div class="container">
-            <div class="row">
-                <div class="col-xl-4 col-lg-5">
-                    <div class="service-details__sidebar">
-                        <div class="service-details__services-box">
-                            <h3 class="service-details__services-title">Our Services</h3>
-                            <ul class="service-details__services-list list-unstyled">
-                                <li v-for="svc in allServices" :key="svc.id" :class="{ active: svc.id === service.id }">
-                                    <a :href="svc.Permalink">{{ getTranslation(svc)?.title }}<span class="icon-next"></span></a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="service-details__sidebar-contact">
-                            <div class="service-details__sidebar-contact-img">
-                                <div class="inner">
-                                    <img src="https://dreamlayout.mnsithub.com/php/tanspotphp/assets/images/services/service-details-sidebar-img.png" alt="">
-                                </div>
-                            </div>
+        <Header />
 
-                            <div class="service-details__sidebar-contact-content">
-                                <div class="icon">
-                                    <span class="icon-phone-call"></span>
+        <section class="page-header" v-if="service">
+            <div class="page-header__bg" :style="`background-image: url(${getImageUrl(service.masthead_image)});`">
+            </div>
+            <div class="container">
+                <div class="page-header__inner">
+                    <div class="page-header__img-1">
+                        <img src="https://dreamlayout.mnsithub.com/php/tanspotphp/assets/images/resources/page-header-img-1.png" alt="">
+                    </div>
+                    <div class="page-header__shape-1 float-bob-y">
+                        <img :src={./src/asserts/img/shapes/banner-one-shape-3.png} alt="">
+                    </div>
+                    <h3 :style="titleStyle">{{ translation?.title }}</h3>
+                    <div class="thm-breadcrumb__inner">
+                        <ul class="thm-breadcrumb list-unstyled">
+                            <li><a href="/">{{ t.home }}</a></li>
+                            <li><span class="fas fa-angle-right"></span></li>
+                            <li><a href="/services">{{ t.services }}</a></li>
+                            <li><span class="fas fa-angle-right"></span></li>
+                            <li>{{ translation?.title }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="service-details" v-if="service">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-4 col-lg-5">
+                        <div class="service-details__sidebar">
+                            <div class="service-details__services-box">
+                                <h3 class="service-details__services-title">{{ t.ourServices }}</h3>
+                                <ul class="service-details__services-list list-unstyled">
+                                    <li v-for="svc in allServices" :key="svc.id"
+                                        :class="{ active: svc.id === service.id }">
+                                        <a :href="svc.Permalink">{{ getTranslation(svc)?.title }}<span
+                                                class="icon-next"></span></a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="service-details__sidebar-contact">
+                                <div class="service-details__sidebar-contact-img">
+                                    <div class="inner">
+                                        <img src="https://dreamlayout.mnsithub.com/php/tanspotphp/assets/images/services/service-details-sidebar-img.png"
+                                            alt="">
+                                    </div>
                                 </div>
-                                <h2><a href="tel:585858575084">+58 585 857 5084</a></h2>
-                                <p>If You Need Any Help <br>
-                                    Contact With Us</p>
+
+                                <div class="service-details__sidebar-contact-content">
+                                    <div class="icon">
+                                        <span class="icon-phone-call"></span>
+                                    </div>
+                                    <h2><a href="tel:585858575084">+58 585 857 5084</a></h2>
+                                    <p>{{ t.ifYouNeedHelp }} <br>
+                                        {{ t.contactWithUs }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-xl-8 col-lg-7">
-                    <div class="service-details__left">
-                        <div class="service-details__img">
-                            <img :src="getImageUrl(service.masthead_image)" :alt="translation?.title">
-                        </div>
-                        <h3 class="service-details__title-1">{{ translation?.title }}</h3>
-                        <div v-html="translation?.description"></div>
-                        
-                        <ul class="service-details__points-list list-unstyled" v-if="translation?.lable && translation.lable.length > 0">
-                            <li v-for="(label, index) in translation.lable" :key="index">
-                                <div class="icon">
-                                    <span class="icon-right-arrow"></span>
-                                </div>
-                                <p>{{ label }}</p>
-                            </li>
-                        </ul>
-                        
-                        <div class="service-details__img-box" v-if="translation?.image_card && translation.image_card.length > 0">
-                            <div class="row">
-                                <div class="col-xl-6" v-for="(cardItem, index) in translation.image_card.slice(0, 2)" :key="index">
-                                    <div class="service-details__img-box-single">
-                                        <div class="service-details__img-box-img">
-                                            <img :src="getImageUrl(cardItem.block_cards_id?.image)" alt="">
-                                        </div>
-                                        <div class="service-details__img-box-content">
-                                            <div class="service-details__img-box-content-icon-and-title">
-                                                <div class="service-details__img-box-content-icon">
-                                                    <span :class="index === 0 ? 'icon-new-product' : 'icon-customer-loyalty'"></span>
-                                                </div>
-                                                <h3 class="service-details__img-box-content-title">
-                                                    {{ getCardTranslation(cardItem.block_cards_id)?.title }}
-                                                </h3>
+                    <div class="col-xl-8 col-lg-7">
+                        <div class="service-details__left">
+                            <div class="service-details__img">
+                                <img :src="getImageUrl(service.masthead_image)" :alt="translation?.title">
+                            </div>
+                            <h3 class="service-details__title-1">{{ translation?.title }}</h3>
+                            <div v-html="translation?.description"></div>
+
+                            <ul class="service-details__points-list list-unstyled"
+                                v-if="translation?.lable && translation.lable.length > 0">
+                                <li v-for="(label, index) in translation.lable" :key="index">
+                                    <div class="icon">
+                                        <span class="icon-right-arrow"></span>
+                                    </div>
+                                    <p>{{ label }}</p>
+                                </li>
+                            </ul>
+
+                            <div class="service-details__img-box"
+                                v-if="translation?.image_card && translation.image_card.length > 0">
+                                <div class="row">
+                                    <div class="col-xl-6"
+                                        v-for="(cardItem, index) in translation.image_card.slice(0, 2)" :key="index">
+                                        <div class="service-details__img-box-single">
+                                            <div class="service-details__img-box-img">
+                                                <img :src="getImageUrl(cardItem.block_cards_id?.image)" alt="">
                                             </div>
-                                            <div v-html="getCardTranslation(cardItem.block_cards_id)?.card_description"></div>
+                                            <div class="service-details__img-box-content">
+                                                <div class="service-details__img-box-content-icon-and-title">
+                                                    <div class="service-details__img-box-content-icon">
+                                                        <span
+                                                            :class="index === 0 ? 'icon-new-product' : 'icon-customer-loyalty'"></span>
+                                                    </div>
+                                                    <h3 class="service-details__img-box-content-title">
+                                                        {{ getCardTranslation(cardItem.block_cards_id)?.title }}
+                                                    </h3>
+                                                </div>
+                                                <div
+                                                    v-html="getCardTranslation(cardItem.block_cards_id)?.card_description">
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="faq-page__single" v-if="translation?.faq && translation.faq.length > 0">
-                            <div class="accrodion-grp faq-one-accrodion" data-grp-name="faq-one-accrodion">
-                                <div class="accrodion" 
-                                     v-for="(faqItem, index) in translation.faq" 
-                                     :key="index"
-                                     :class="{ active: activeFaq === index }">
-                                    <div class="accrodion-title" @click="toggleFaq(index)">
-                                        <h4>{{ faqItem.title }}</h4>
-                                    </div>
-                                    <div class="accrodion-content" :style="{ display: activeFaq === index ? 'block' : 'none' }">
-                                        <div class="inner">
-                                            <p>{{ faqItem.description }}</p>
+
+                            <div class="faq-page__single" v-if="translation?.faq && translation.faq.length > 0">
+                                <div class="accrodion-grp faq-one-accrodion" data-grp-name="faq-one-accrodion">
+                                    <div class="accrodion" v-for="(faqItem, index) in translation.faq" :key="index"
+                                        :class="{ active: activeFaq === index }">
+                                        <div class="accrodion-title" @click="toggleFaq(index)">
+                                            <h4>{{ faqItem.title }}</h4>
+                                        </div>
+                                        <div class="accrodion-content"
+                                            :style="{ display: activeFaq === index ? 'block' : 'none' }">
+                                            <div class="inner">
+                                                <p>{{ faqItem.description }}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -92,9 +126,8 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-    <Footer />
+        </section>
+        <Footer />
     </div>
 </template>
 
@@ -102,11 +135,28 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useLanguage } from '@/composables/useLanguage';
+import { commonTranslations } from '@/locales/common';
 import Header from '../layouts/Header.vue';
 import Footer from '../layouts/Footer.vue';
 
 const route = useRoute();
 const { currentLanguage } = useLanguage();
+
+// Get common translations for current language
+const t = computed(() => {
+    return commonTranslations[currentLanguage.value] || commonTranslations['en-US'];
+});
+
+// Dynamic title styling for different languages
+const titleStyle = computed(() => {
+    if (currentLanguage.value === 'mm') {
+        return { fontSize: '32px', lineHeight: '1.4' };
+    }
+    if (currentLanguage.value === 'th') {
+        return { fontSize: '36px', lineHeight: '1.3' };
+    }
+    return { fontSize: '42px', lineHeight: '1.2' };
+});
 
 const service = ref(null);
 const allServices = ref([]);
@@ -115,31 +165,31 @@ const activeFaq = ref(0);
 
 const translation = computed(() => {
     if (!service.value || !service.value.translations) return null;
-    
+
     const trans = service.value.translations.find(
         t => t.languages_code === currentLanguage.value
     );
-    
+
     return trans || service.value.translations[0];
 });
 
 const getTranslation = (svc) => {
     if (!svc || !svc.translations) return null;
-    
+
     const trans = svc.translations.find(
         t => t.languages_code === currentLanguage.value
     );
-    
+
     return trans || svc.translations[0];
 };
 
 const getCardTranslation = (card) => {
     if (!card || !card.translations) return null;
-    
+
     const trans = card.translations.find(
         t => t.languages_code === currentLanguage.value
     );
-    
+
     return trans || card.translations[0];
 };
 
@@ -157,7 +207,7 @@ const fetchServiceByPermalink = async (permalink) => {
         loading.value = true;
         const response = await fetch(`http://0.0.0.0:8055/items/services?fields=*,translations.*,translations.image_card.*,translations.image_card.block_cards_id.*,translations.image_card.block_cards_id.translations.*&filter[Permalink][_eq]=${permalink}&filter[status][_eq]=published`);
         const data = await response.json();
-        
+
         if (data.data && data.data.length > 0) {
             service.value = data.data[0];
         }
@@ -172,7 +222,7 @@ const fetchAllServices = async () => {
     try {
         const response = await fetch('http://0.0.0.0:8055/items/services?fields=*,translations.*&filter[status][_eq]=published&sort=date_created');
         const data = await response.json();
-        
+
         if (data.data) {
             allServices.value = data.data;
         }
@@ -629,17 +679,17 @@ watch(() => route.path, (newPath) => {
     .service-details {
         padding: 60px 0;
     }
-    
+
     .service-details__title-1 {
         font-size: 28px;
         line-height: 38px;
     }
-    
+
     .service-details__services-box,
     .service-details__sidebar-download-box {
         padding: 30px 20px;
     }
-    
+
     .service-details__sidebar-contact-content {
         padding: 30px 20px;
     }
