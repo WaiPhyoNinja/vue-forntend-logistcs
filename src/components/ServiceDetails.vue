@@ -1,4 +1,6 @@
 <template>
+    <div class="page-wrapper">
+       <Header />
     <section class="service-details" v-if="service">
         <div class="container">
             <div class="row">
@@ -92,12 +94,16 @@
             </div>
         </div>
     </section>
+    <Footer />
+    </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useLanguage } from '@/composables/useLanguage';
+import Header from '../layouts/Header.vue';
+import Footer from '../layouts/Footer.vue';
 
 const route = useRoute();
 const { currentLanguage } = useLanguage();
