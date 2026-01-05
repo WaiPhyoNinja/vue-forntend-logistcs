@@ -41,23 +41,44 @@
                                     </li>
                                 </ul>
                             </div>
-                            <div class="service-details__sidebar-contact">
+
+                             <div class="service-details__sidebar-contact" v-if="locationData">
                                 <div class="service-details__sidebar-contact-img">
                                     <div class="inner">
-                                        <img src="https://dreamlayout.mnsithub.com/php/tanspotphp/assets/images/services/service-details-sidebar-img.png"
-                                            alt="">
+                                        <img :src="getImageUrl(locationData.image)"
+                                            :alt="getLocationTranslation(locationData)?.title">
                                     </div>
                                 </div>
 
                                 <div class="service-details__sidebar-contact-content">
-                                    <div class="icon">
-                                        <span class="icon-phone-call"></span>
-                                    </div>
-                                    <h2><a href="tel:585858575084">+58 585 857 5084</a></h2>
-                                    <p>{{ t.ifYouNeedHelp }} <br>
+                                    <p class="help-text">{{ t.ifYouNeedHelp }} <br>
                                         {{ t.contactWithUs }}</p>
+
+                                    <div class="contact-info-item">
+                                        <div class="content">
+                                            <h2 v-if="getLocationTranslation(locationData)?.phone">
+                                                <a :href="`tel:${getLocationTranslation(locationData).phone}`">
+                                                    {{ getLocationTranslation(locationData).phone }}
+                                                </a>
+                                            </h2>
+                                        </div>
+                                    </div>
+
+                                    <div class="contact-info-item" v-if="getLocationTranslation(locationData)?.address">
+                                        <div class="content">
+                                            <p>{{ getLocationTranslation(locationData).address }}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="contact-info-item" v-if="getLocationTranslation(locationData)?.opening_hours">
+                                        <div class="content">
+                                            <p>{{ getLocationTranslation(locationData).opening_hours }}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+
+                           
                         </div>
                     </div>
                     <div class="col-xl-8 col-lg-7">
@@ -160,6 +181,7 @@ const titleStyle = computed(() => {
 
 const service = ref(null);
 const allServices = ref([]);
+const locationData = ref(null);
 const loading = ref(true);
 const activeFaq = ref(0);
 
@@ -191,6 +213,16 @@ const getCardTranslation = (card) => {
     );
 
     return trans || card.translations[0];
+};
+
+const getLocationTranslation = (location) => {
+    if (!location || !location.translations) return null;
+
+    const trans = location.translations.find(
+        t => t.languages_code === currentLanguage.value
+    );
+
+    return trans || location.translations[0];
 };
 
 const getImageUrl = (imageId) => {
@@ -231,10 +263,24 @@ const fetchAllServices = async () => {
     }
 };
 
+const fetchLocation = async () => {
+    try {
+        const response = await fetch('http://0.0.0.0:8055/items/locations?fields=*,translations.*&filter[status][_eq]=published&limit=1');
+        const data = await response.json();
+
+        if (data.data && data.data.length > 0) {
+            locationData.value = data.data[0];
+        }
+    } catch (error) {
+        console.error('Error fetching location:', error);
+    }
+};
+
 onMounted(() => {
     const permalink = route.path;
     fetchServiceByPermalink(permalink);
     fetchAllServices();
+    fetchLocation();
 });
 
 watch(() => route.path, (newPath) => {
@@ -377,6 +423,79 @@ watch(() => route.path, (newPath) => {
 .service-details__sidebar-contact-content p {
     font-size: 16px;
     color: #ffffff;
+    margin: 0;
+}
+
+.help-text {
+    font-size: 16px;
+    color: #ffffff;
+    margin-bottom: 25px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.contact-info-item {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.contact-info-item:last-child {
+    margin-bottom: 0;
+}
+
+.contact-info-item .icon {
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.contact-info-item .icon span {
+    font-size: 28px;
+    color: #ffffff;
+}
+
+.contact-info-item .content h2 {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 28px;
+    margin: 0;
+}
+
+.contact-info-item .content h2 a {
+    color: #ffffff;
+    transition: all 500ms ease;
+}
+
+.contact-info-item .content h2 a:hover {
+    opacity: 0.8;
+}
+
+.contact-info-item .content p {
+    font-size: 14px;
+    color: #ffffff;
+    line-height: 22px;
+    margin: 0;
+}
+
+.location-address {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.location-address .icon-wrapper {
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.location-address .icon-wrapper span {
+    font-size: 24px;
+    color: #ffffff;
+}
+
+.location-address p {
+    font-size: 14px;
+    color: #ffffff;
+    line-height: 24px;
     margin: 0;
 }
 
