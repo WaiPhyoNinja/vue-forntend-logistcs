@@ -18,6 +18,7 @@ const t = computed(() => useAuthTranslation(currentLanguage.value));
 const locationData = ref(null);
 const socialIcons = ref([]);
 const menuItems = ref([]);
+const headerData = ref(null);
 const isDropdownOpen = ref(false);
 const isDropdownOpenSticky = ref(false);
 const showUserDropdown = ref(false);
@@ -58,8 +59,15 @@ const currentLanguageInfo = computed(() => {
 
 const getSocialIconUrl = (iconId) => {
   if (!iconId) return '';
-  return `http://0.0.0.0:8055/assets/${iconId}`;
+  const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+  return `${baseUrl}/assets/${iconId}`;
 };
+
+const getLogoUrl = computed(() => {
+  if (!headerData.value?.logo) return '';
+  const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+  return `${baseUrl}/assets/${headerData.value.logo}`;
+});
 
 // Watch for language changes and apply body class
 watch(currentLanguage, (newLang) => {
@@ -171,6 +179,15 @@ onMounted(async () => {
     if (menuResponse && menuResponse.length > 0) {
       menuItems.value = menuResponse[0].items || [];
       
+    }
+
+    // Fetch header data (logo) from Directus
+    const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+    const headerResponse = await fetch(`${baseUrl}/items/header?fields=*,items.*,translations.*`);
+    const headerJson = await headerResponse.json();
+    
+    if (headerJson.data && headerJson.data.length > 0) {
+      headerData.value = headerJson.data[0];
     }
 
     // Close dropdown when clicking outside
@@ -331,7 +348,7 @@ onMounted(async () => {
                     <div class="main-menu__wrapper-inner">
                         <div class="main-menu__left">
                             <div class="main-menu__logo">
-                                <a href="#"><img src="https://dreamlayout.mnsithub.com/php/tanspotphp/assets/images/resources/logo-1.png" alt=""></a>
+                                <a href="#"><img :src="getLogoUrl || 'https://dreamlayout.mnsithub.com/php/tanspotphp/assets/images/resources/logo-1.png'" alt="Logo"></a>
                             </div>
                         </div>
                         <div class="main-menu__main-menu-box">

@@ -227,7 +227,8 @@ const getLocationTranslation = (location) => {
 
 const getImageUrl = (imageId) => {
     if (!imageId) return '';
-    return `http://0.0.0.0:8055/assets/${imageId}`;
+    const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+    return `${baseUrl}/assets/${imageId}`;
 };
 
 const toggleFaq = (index) => {
@@ -237,7 +238,8 @@ const toggleFaq = (index) => {
 const fetchServiceByPermalink = async (permalink) => {
     try {
         loading.value = true;
-        const response = await fetch(`http://0.0.0.0:8055/items/services?fields=*,translations.*,translations.image_card.*,translations.image_card.block_cards_id.*,translations.image_card.block_cards_id.translations.*&filter[Permalink][_eq]=${permalink}&filter[status][_eq]=published`);
+        const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+        const response = await fetch(`${baseUrl}/items/services?fields=*,translations.*,translations.image_card.*,translations.image_card.block_cards_id.*,translations.image_card.block_cards_id.translations.*&filter[Permalink][_eq]=${permalink}&filter[status][_eq]=published`);
         const data = await response.json();
 
         if (data.data && data.data.length > 0) {
@@ -252,7 +254,8 @@ const fetchServiceByPermalink = async (permalink) => {
 
 const fetchAllServices = async () => {
     try {
-        const response = await fetch('http://0.0.0.0:8055/items/services?fields=*,translations.*&filter[status][_eq]=published&sort=date_created');
+        const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+        const response = await fetch(`${baseUrl}/items/services?fields=*,translations.*&filter[status][_eq]=published&sort=date_created`);
         const data = await response.json();
 
         if (data.data) {
@@ -265,7 +268,8 @@ const fetchAllServices = async () => {
 
 const fetchLocation = async () => {
     try {
-        const response = await fetch('http://0.0.0.0:8055/items/locations?fields=*,translations.*&filter[status][_eq]=published&limit=1');
+        const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+        const response = await fetch(`${baseUrl}/items/locations?fields=*,translations.*&filter[status][_eq]=published&limit=1`);
         const data = await response.json();
 
         if (data.data && data.data.length > 0) {

@@ -171,12 +171,14 @@ const footerLogoUrl = computed(() => {
   if (!footerData.value?.footer_logo) {
     return 'https://dreamlayout.mnsithub.com/php/tanspotphp/assets/images/resources/footer-logo.png';
   }
-  return `http://0.0.0.0:8055/assets/${footerData.value.footer_logo}`;
+  const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+  return `${baseUrl}/assets/${footerData.value.footer_logo}`;
 });
 
 const getSocialIconUrl = (iconId) => {
   if (!iconId) return '';
-  return `http://0.0.0.0:8055/assets/${iconId}`;
+  const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+  return `${baseUrl}/assets/${iconId}`;
 };
 
 const getMenuItemTranslation = (item) => {

@@ -112,7 +112,8 @@ const faqItems = computed(() => {
 // Get image URL from Directus
 const imageUrl = computed(() => {
     if (!props.data?.image) return '';
-    return `http://0.0.0.0:8055/assets/${props.data.image}`;
+    const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+    return `${baseUrl}/assets/${props.data.image}`;
 });
 
 // Alternate animation classes for accordion items

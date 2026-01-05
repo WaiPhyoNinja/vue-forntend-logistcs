@@ -36,7 +36,7 @@ const props = defineProps({
 });
 
 const { currentLanguage } = useLanguage();
-const directusUrl = 'http://0.0.0.0:8055';
+const directusUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
 
 const currentTranslation = computed(() => {
     if (!props.data?.translations) return null;

@@ -41,7 +41,8 @@ const translation = computed(() => {
 const getImageUrl = (imageId) => {
   if (!imageId) return '';
   if (imageId.startsWith('http')) return imageId;
-  return `http://0.0.0.0:8055/assets/${imageId}`;
+  const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+  return `${baseUrl}/assets/${imageId}`;
 };
 </script>
 

@@ -28,7 +28,8 @@ const getMenuItemTranslation = (item) => {
 
 const getSocialIconUrl = (iconId) => {
   if (!iconId) return '';
-  return `http://0.0.0.0:8055/assets/${iconId}`;
+  const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+  return `${baseUrl}/assets/${iconId}`;
 };
 
 const handleNavClick = (url) => {

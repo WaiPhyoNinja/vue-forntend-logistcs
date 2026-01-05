@@ -732,7 +732,8 @@ const handleSubmit = async () => {
         let result
         if (editQuoteId.value) {
             // Use authenticated request for update
-            const response = await fetch(`http://0.0.0.0:8055/items/quote_requests/${editQuoteId.value}`, {
+            const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+            const response = await fetch(`${baseUrl}/items/quote_requests/${editQuoteId.value}`, {
                 method: 'PATCH',
                 headers: {
                     'Authorization': `Bearer ${authToken}`,
@@ -744,7 +745,8 @@ const handleSubmit = async () => {
             console.log('Quote request updated successfully:', result)
         } else {
             // Use authenticated request for create
-            const response = await fetch('http://0.0.0.0:8055/items/quote_requests', {
+            const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+            const response = await fetch(`${baseUrl}/items/quote_requests`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${authToken}`,

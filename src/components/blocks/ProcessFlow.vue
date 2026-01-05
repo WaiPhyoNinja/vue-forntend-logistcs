@@ -80,7 +80,8 @@ const getIconClass = (number) => {
 // Get background image URL for the map
 const getImageUrl = (fileId) => {
   if (!fileId) return '';
-  return `http://0.0.0.0:8055/assets/${fileId}`;
+  const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+  return `${baseUrl}/assets/${fileId}`;
 };
 
 // Strip HTML tags for plain text display

@@ -372,7 +372,8 @@ const fetchQuoteRequests = async () => {
             limit: filterQuery.limit.toString()
         });
         
-        const fetchResponse = await fetch(`http://0.0.0.0:8055/items/quote_requests?${queryParams}`, {
+        const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+        const fetchResponse = await fetch(`${baseUrl}/items/quote_requests?${queryParams}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${authToken}`,
@@ -389,7 +390,8 @@ const fetchQuoteRequests = async () => {
         if ((!response || response.length === 0) && user.value.email) {
             console.log('No results with user_created filter, trying email fallback...');
             
-            const allQuotesResponse = await fetch(`http://0.0.0.0:8055/items/quote_requests?sort=-date_created&limit=100`, {
+            const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+            const allQuotesResponse = await fetch(`${baseUrl}/items/quote_requests?sort=-date_created&limit=100`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${authToken}`,
