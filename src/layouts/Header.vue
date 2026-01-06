@@ -274,7 +274,7 @@ onMounted(async () => {
                     <div class="main-menu__wrapper-inner">
                         <div class="main-menu__left">
                             <div class="main-menu__logo">
-                                <a href="#"><img src="https://dreamlayout.mnsithub.com/php/tanspotphp/assets/images/resources/logo-1.png" alt=""></a>
+                                <a href="#"><img :src="getLogoUrl || ''" alt="Logo"></a>
                             </div>
                         </div>
                         <div class="main-menu__main-menu-box">
