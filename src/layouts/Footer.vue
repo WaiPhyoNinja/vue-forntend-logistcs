@@ -156,21 +156,18 @@ const footerTranslation = computed(() => {
 });
 
 const quickLinksTitle = computed(() => {
-  if (!quickLinksMenuData.value?.translations) return quickLinksMenuData.value?.title || 'Quick Links';
+  if (!quickLinksMenuData.value?.translations) return quickLinksMenuData.value?.title || '';
   const translation = getTranslation(quickLinksMenuData.value.translations);
-  return translation?.menu_header || quickLinksMenuData.value?.title || 'Quick Links';
+  return translation?.menu_header || quickLinksMenuData.value?.title || '';
 });
 
 const servicesTitle = computed(() => {
-  if (!servicesMenuData.value?.translations) return servicesMenuData.value?.title || 'Services';
+  if (!servicesMenuData.value?.translations) return servicesMenuData.value?.title || '';
   const translation = getTranslation(servicesMenuData.value.translations);
-  return translation?.menu_header || servicesMenuData.value?.title || 'Services';
+  return translation?.menu_header || servicesMenuData.value?.title || '';
 });
 
 const footerLogoUrl = computed(() => {
-  if (!footerData.value?.footer_logo) {
-    return 'https://dreamlayout.mnsithub.com/php/tanspotphp/assets/images/resources/footer-logo.png';
-  }
   const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
   return `${baseUrl}/assets/${footerData.value.footer_logo}`;
 });
@@ -257,7 +254,7 @@ onMounted(async () => {
     const servicesResponse = await directus.request(
       readItems('menu', {
         fields: ['*', 'items.*', 'items.translations.*', 'translations.*'],
-        filter: { menu_id: { _eq: 'services' }, is_active: { _eq: true } }
+        filter: { menu_id: { _eq: 'solutions' }, is_active: { _eq: true } }
       })
     );
     

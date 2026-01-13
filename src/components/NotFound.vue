@@ -3,7 +3,7 @@
         <div class="container">
             <div class="error-page__inner text-center">
                 <div class="error-page__img float-bob-y">
-                    <img src="../assets/img/error-page-img1.png" alt="">
+                    <img src="/assets/img/error-page-img1.png" alt="">
                 </div>
 
                 <div class="error-page__content">

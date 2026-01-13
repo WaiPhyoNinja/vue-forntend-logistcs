@@ -36,12 +36,12 @@ const getImageUrl = (imageObj) => {
   
   // Handle object with directus_files_id
   if (typeof imageObj === 'object' && imageObj.directus_files_id) {
-    return `http://0.0.0.0:8055/assets/${imageObj.directus_files_id}`;
+    return `https://admin.westeastfreight.com/assets/${imageObj.directus_files_id}`;
   }
   
   // Handle direct string/number ID
   if (typeof imageObj === 'string' || typeof imageObj === 'number') {
-    return `http://0.0.0.0:8055/assets/${imageObj}`;
+    return `https://admin.westeastfreight.com/assets/${imageObj}`;
   }
   
   return '';

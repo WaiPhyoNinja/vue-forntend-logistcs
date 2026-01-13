@@ -9,7 +9,8 @@
                 <div class="find-transport__btn-and-call">
                     <div class="find-transport__call-us">
                         <div class="icon">
-                            <img v-if="iconUrl" :src="iconUrl" alt="" style="width: 50px; height: 50px;">
+                           
+                            <span class="icon-phone-call"></span>
                         </div>
                         <div class="content" v-html="content"></div>
                     </div>

@@ -8,10 +8,10 @@
             <div class="container">
                 <div class="page-header__inner">
                     <div class="page-header__img-1">
-                        <img src="/src/assets/img/page-header-img-1.png" alt="">
+                        <img src="/assets/img/page-header-img-1.png" alt="">
                     </div>
                     <div class="page-header__shape-1 float-bob-y">
-                        <img src="/src/assets/img/shapes/banner-one-shape-3.png" alt="">
+                        <img src="/assets/img/shapes/banner-one-shape-3.png" alt="">
                     </div>
                     <h3 :style="titleStyle">{{ translation?.title }}</h3>
                     <div class="thm-breadcrumb__inner">
@@ -45,7 +45,7 @@
                              <div class="service-details__sidebar-contact" v-if="locationData">
                                 <div class="service-details__sidebar-contact-img">
                                     <div class="inner">
-                                        <img :src="getImageUrl(locationData.image)"
+                                        <img src="/assets/img/service-details-sidebar-img.png"
                                             :alt="getLocationTranslation(locationData)?.title">
                                     </div>
                                 </div>
@@ -227,7 +227,7 @@ const getLocationTranslation = (location) => {
 
 const getImageUrl = (imageId) => {
     if (!imageId) return '';
-    const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+    const baseUrl = import.meta.env.VITE_DIRECTUS_URL || '';
     return `${baseUrl}/assets/${imageId}`;
 };
 
@@ -238,7 +238,7 @@ const toggleFaq = (index) => {
 const fetchServiceByPermalink = async (permalink) => {
     try {
         loading.value = true;
-        const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+        const baseUrl = import.meta.env.VITE_DIRECTUS_URL || '';
         const response = await fetch(`${baseUrl}/items/services?fields=*,translations.*,translations.image_card.*,translations.image_card.block_cards_id.*,translations.image_card.block_cards_id.translations.*&filter[Permalink][_eq]=${permalink}&filter[status][_eq]=published`);
         const data = await response.json();
 
@@ -254,7 +254,7 @@ const fetchServiceByPermalink = async (permalink) => {
 
 const fetchAllServices = async () => {
     try {
-        const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+        const baseUrl = import.meta.env.VITE_DIRECTUS_URL || '';
         const response = await fetch(`${baseUrl}/items/services?fields=*,translations.*&filter[status][_eq]=published&sort=date_created`);
         const data = await response.json();
 
@@ -268,10 +268,9 @@ const fetchAllServices = async () => {
 
 const fetchLocation = async () => {
     try {
-        const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
-        const response = await fetch(`${baseUrl}/items/locations?fields=*,translations.*&filter[status][_eq]=published&limit=1`);
+        const baseUrl = import.meta.env.VITE_DIRECTUS_URL || '';
+        const response = await fetch(`${baseUrl}items/locations?fields=*,translations.*&filter[status][_eq]=published&limit=1`);
         const data = await response.json();
-
         if (data.data && data.data.length > 0) {
             locationData.value = data.data[0];
         }

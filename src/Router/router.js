@@ -61,6 +61,11 @@ const routes = [
     component: ServiceDetails
   },
   {
+    path: '/solutions/:slug',
+    name: 'ServiceDetails',
+    component: ServiceDetails
+  },
+  {
     path: '/:slug',
     name: 'DynamicPage',
     component: Index

@@ -216,7 +216,7 @@ const servicesItems = computed(() => {
             title: translation?.title_seo || translation?.title || '',
             description: translation?.desription_seo || '',
             icon: getIconClass(service.services_type),
-            link: `/services/${service.id}`
+            link: service.Permalink
         };
     }).filter(item => item !== null);
 });

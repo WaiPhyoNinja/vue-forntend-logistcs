@@ -2,7 +2,7 @@
     <section class="banner-two">
     <div class="banner-two__pattern" style="background-image: url(assets/images/shapes/banner-two-pattern.png);"></div>
     <div class="banner-two__map-1">
-        <img src="../../assets/img/banner-two-map-1.png" alt="" class="img-bounce">
+        <img src="/assets/img/banner-two-map-1.png" alt="" class="img-bounce">
     </div>
     <div class="container">
         <div class="row">

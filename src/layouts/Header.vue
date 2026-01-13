@@ -59,13 +59,13 @@ const currentLanguageInfo = computed(() => {
 
 const getSocialIconUrl = (iconId) => {
   if (!iconId) return '';
-  const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+  const baseUrl = import.meta.env.VITE_DIRECTUS_URL || '';
   return `${baseUrl}/assets/${iconId}`;
 };
 
 const getLogoUrl = computed(() => {
   if (!headerData.value?.logo) return '';
-  const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+  const baseUrl = import.meta.env.VITE_DIRECTUS_URL || '';
   return `${baseUrl}/assets/${headerData.value.logo}`;
 });
 
@@ -182,7 +182,7 @@ onMounted(async () => {
     }
 
     // Fetch header data (logo) from Directus
-    const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+    const baseUrl = import.meta.env.VITE_DIRECTUS_URL || '';
     const headerResponse = await fetch(`${baseUrl}/items/header?fields=*,items.*,translations.*`);
     const headerJson = await headerResponse.json();
     

@@ -102,7 +102,7 @@ const translation = computed(() => {
 
 const imageUrl = computed(() => {
     if (!aboutContent.value?.image) return '';
-    return `http://0.0.0.0:8055/assets/${aboutContent.value.image}`;
+    return `https://admin.westeastfreight.com/assets/${aboutContent.value.image}`;
 });
 
 const animationText = computed(() => {
@@ -137,7 +137,7 @@ const curvedCircleHTML = computed(() => {
 const fetchAboutContent = async () => {
     try {
         loading.value = true;
-        const response = await fetch('http://0.0.0.0:8055/items/block_about_us?fields=*,translations.*');
+        const response = await fetch('https://admin.westeastfreight.com/items/block_about_us?fields=*,translations.*');
         const data = await response.json();
         
         if (data.data && data.data.length > 0) {

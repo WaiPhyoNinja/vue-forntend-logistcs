@@ -28,7 +28,7 @@ const getMenuItemTranslation = (item) => {
 
 const getSocialIconUrl = (iconId) => {
   if (!iconId) return '';
-  const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+  const baseUrl = import.meta.env.VITE_DIRECTUS_URL || '';
   return `${baseUrl}/assets/${iconId}`;
 };
 

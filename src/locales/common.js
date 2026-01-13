@@ -1,7 +1,7 @@
 export const commonTranslations = {
   'en-US': {
     home: 'Home',
-    services: 'Services',
+    services: 'Solutions',
     about: 'About',
     contact: 'Contact',
     blog: 'Blog',

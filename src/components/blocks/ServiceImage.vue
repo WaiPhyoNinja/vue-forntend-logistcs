@@ -58,7 +58,7 @@ const getTranslation = (service) => {
 
 const getImageUrl = (imageId) => {
     if (!imageId) return '';
-    const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+    const baseUrl = import.meta.env.VITE_DIRECTUS_URL || '';
     return `${baseUrl}/assets/${imageId}`;
 };
 
@@ -80,7 +80,7 @@ const getServiceIcon = (serviceType) => {
 const fetchServices = async () => {
     try {
         loading.value = true;
-        const response = await fetch('http://0.0.0.0:8055/items/services?fields=*,translations.*&filter[status][_eq]=published&sort=date_created');
+        const response = await fetch('https://admin.westeastfreight.com/items/services?fields=*,translations.*&filter[status][_eq]=published&sort=date_created');
         const data = await response.json();
         
         if (data.data) {

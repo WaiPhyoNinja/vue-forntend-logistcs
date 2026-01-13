@@ -39,7 +39,7 @@ const props = defineProps({
 
 const { currentLanguage } = useLanguage();
 
-const directusUrl = 'http://0.0.0.0:8055';
+const directusUrl = 'https://admin.westeastfreight.com';
 
 // Computed properties for current language translation
 const currentTranslation = computed(() => {

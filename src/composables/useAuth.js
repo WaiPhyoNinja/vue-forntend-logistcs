@@ -11,7 +11,7 @@ export function useAuth() {
   const login = async (email, password) => {
     try {
       // Direct fetch to Directus auth endpoint
-      const response = await fetch('http://0.0.0.0:8055/auth/login', {
+      const response = await fetch('https://admin.westeastfreight.com/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ export function useAuth() {
       // Customer role ID from Directus
       const CUSTOMER_ROLE_ID = '9162cd13-ae93-4c85-bba9-8d388f2cf1f2';
       
-      const response = await fetch('http://0.0.0.0:8055/users', {
+      const response = await fetch('https://admin.westeastfreight.com/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -138,7 +138,7 @@ export function useAuth() {
   const logout = async () => {
     try {
       if (token.value) {
-        await fetch('http://0.0.0.0:8055/auth/logout', {
+        await fetch('https://admin.westeastfreight.com/auth/logout', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token.value}`,
@@ -164,7 +164,7 @@ export function useAuth() {
         return null;
       }
       
-      const response = await fetch('http://0.0.0.0:8055/users/me', {
+      const response = await fetch('https://admin.westeastfreight.com/users/me', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token.value}`,
@@ -210,14 +210,14 @@ export function useAuth() {
   // Password reset request
   const requestPasswordReset = async (email) => {
     try {
-      const response = await fetch('http://0.0.0.0:8055/auth/password/request', {
+      const response = await fetch('https://admin.westeastfreight.com/auth/password/request', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
           email,
-          reset_url: 'http://localhost:5174/reset-password'
+          reset_url: 'https://westeastfreight.com/reset-password'
         })
       });
 
@@ -255,7 +255,7 @@ export function useAuth() {
   // Reset password with token
   const resetPassword = async (resetToken, newPassword) => {
     try {
-      const response = await fetch('http://0.0.0.0:8055/auth/password/reset', {
+      const response = await fetch('https://admin.westeastfreight.com/auth/password/reset', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

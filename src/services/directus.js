@@ -1,7 +1,7 @@
 import { createDirectus, rest, authentication } from '@directus/sdk';
 
 // Use proxy in development, direct URL in production
-const baseUrl = import.meta.env.DEV ? 'http://localhost:5174/api' : 'http://0.0.0.0:8055';
+const baseUrl = import.meta.env.DEV ? 'https://westeastfreight.com/' : 'https://admin.westeastfreight.com/';
 
 const directus = createDirectus(baseUrl)
     .with(rest())
