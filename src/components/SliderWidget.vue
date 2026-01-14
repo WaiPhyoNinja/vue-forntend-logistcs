@@ -15,7 +15,6 @@
                             
                             <!-- Menu Links -->
                             <div class="content-box">
-                                <h4>Quick Links</h4>
                                 <ul class="sidebar-menu list-unstyled">
                                     <li v-for="item in menuItems" :key="item.id">
                                         <a :href="item.url || '#'">
