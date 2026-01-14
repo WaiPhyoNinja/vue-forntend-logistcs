@@ -25,7 +25,7 @@
                         <div class="footer-widget__column footer-widget__about">
                             <div class="footer-widget__logo">
                                 <router-link to="/">
-                                    <img :src="footerLogoUrl" alt="Footer Logo">
+                                    <img :src="footerLogoUrl" width="170" alt="Footer Logo">
                                 </router-link>
                             </div>
                             <p class="footer-widget__about-text">
