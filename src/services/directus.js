@@ -1,7 +1,7 @@
 import { createDirectus, rest, authentication } from '@directus/sdk';
 
-// Use proxy in development, direct URL in production
-const baseUrl = import.meta.env.DEV ? 'https://westeastfreight.com/' : 'https://admin.westeastfreight.com/';
+// Use environment variable with fallback
+const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
 
 const directus = createDirectus(baseUrl)
     .with(rest())

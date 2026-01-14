@@ -274,6 +274,7 @@
         
         <Footer />
     </div>
+    <MobileSlider />
 </template>
 
 <script setup>
@@ -287,6 +288,7 @@ import directus from '@/services/directus';
 import Swal from 'sweetalert2';
 import Header from '../layouts/Header.vue';
 import Footer from '../layouts/Footer.vue';
+import MobileSlider from './MobileSlider.vue';
 
 const router = useRouter();
 const { user, logout } = useAuth();

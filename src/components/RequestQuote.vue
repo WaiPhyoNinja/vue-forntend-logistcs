@@ -542,7 +542,7 @@
         </section>
         <Footer />
     </div>
-
+    <MobileSlider />
 </template>
 
 <script setup>
@@ -550,6 +550,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Footer from '../layouts/Footer.vue'
 import Header from '../layouts/Header.vue'
+import MobileSlider from './MobileSlider.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useLanguage } from '@/composables/useLanguage'
 import { quoteTranslations } from '@/locales/quote'

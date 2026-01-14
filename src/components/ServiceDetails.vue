@@ -150,6 +150,7 @@
         </section>
         <Footer />
     </div>
+    <MobileSlider />
 </template>
 
 <script setup>
@@ -159,6 +160,7 @@ import { useLanguage } from '@/composables/useLanguage';
 import { commonTranslations } from '@/locales/common';
 import Header from '../layouts/Header.vue';
 import Footer from '../layouts/Footer.vue';
+import MobileSlider from './MobileSlider.vue';
 
 const route = useRoute();
 const { currentLanguage } = useLanguage();

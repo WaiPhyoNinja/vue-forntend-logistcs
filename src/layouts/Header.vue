@@ -274,7 +274,7 @@ onMounted(async () => {
                     <div class="main-menu__wrapper-inner">
                         <div class="main-menu__left">
                             <div class="main-menu__logo">
-                                <a href="#"><img :src="getLogoUrl || ''" alt="Logo"></a>
+                                <a href="#"><img :src="getLogoUrl || ''" width="170" alt="Logo"></a>
                             </div>
                         </div>
                         <div class="main-menu__main-menu-box">
@@ -348,7 +348,7 @@ onMounted(async () => {
                     <div class="main-menu__wrapper-inner">
                         <div class="main-menu__left">
                             <div class="main-menu__logo">
-                                <a href="#"><img :src="getLogoUrl || 'https://dreamlayout.mnsithub.com/php/tanspotphp/assets/images/resources/logo-1.png'" alt="Logo"></a>
+                                <a href="#"><img :src="getLogoUrl || ''" width="170" alt="Logo"></a>
                             </div>
                         </div>
                         <div class="main-menu__main-menu-box">

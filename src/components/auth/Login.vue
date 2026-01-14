@@ -87,6 +87,7 @@
 
         <Footer />
     </div>
+    <MobileSlider />
 </template>
 
 <script setup>
@@ -95,6 +96,7 @@ import { useRouter } from 'vue-router';
 import { useAuth } from '@/composables/useAuth';
 import { useLanguage } from '@/composables/useLanguage';
 import { useAuthTranslation } from '@/locales/auth';
+import MobileSlider from '../MobileSlider.vue';
 import Swal from 'sweetalert2';
 import Header from '../../layouts/Header.vue';
 import Footer from '../../layouts/Footer.vue';

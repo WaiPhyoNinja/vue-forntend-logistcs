@@ -6,15 +6,30 @@ import { readItems } from '@directus/sdk';
 import { useLanguage } from '@/composables/useLanguage';
 import { useMobileNav } from '@/composables/useMobileNav';
 import { useAuth } from '@/composables/useAuth';
+import { useAuthTranslation } from '@/locales/auth';
 
 const router = useRouter();
-const { currentLanguage, getTranslation } = useLanguage();
+const { currentLanguage, getTranslation, setLanguage } = useLanguage();
 const { isMobileNavOpen, toggleMobileNav } = useMobileNav();
 const { isAuthenticated, user } = useAuth();
+const t = computed(() => useAuthTranslation(currentLanguage.value));
 
 const menuItems = ref([]);
 const locationData = ref(null);
 const socialIcons = ref([]);
+const headerData = ref(null);
+const isLanguageDropdownOpen = ref(false);
+
+// Language display info
+const languages = [
+  { code: 'en', name: 'English', flag: 'us', fullCode: 'en-US' },
+  { code: 'mm', name: 'Myanmar', flag: 'mm', fullCode: 'mm' },
+  { code: 'th', name: 'ThaiLand', flag: 'th', fullCode: 'th' }
+];
+
+const currentLanguageInfo = computed(() => {
+  return languages.find(lang => lang.fullCode === currentLanguage.value) || languages[0];
+});
 
 const currentTranslation = computed(() => {
   if (!locationData.value || !locationData.value.translations) return null;
@@ -30,6 +45,21 @@ const getSocialIconUrl = (iconId) => {
   if (!iconId) return '';
   const baseUrl = import.meta.env.VITE_DIRECTUS_URL || '';
   return `${baseUrl}/assets/${iconId}`;
+};
+
+const getLogoUrl = computed(() => {
+  if (!headerData.value?.logo) return '';
+  const baseUrl = import.meta.env.VITE_DIRECTUS_URL || '';
+  return `${baseUrl}/assets/${headerData.value.logo}`;
+});
+
+const toggleLanguageDropdown = () => {
+  isLanguageDropdownOpen.value = !isLanguageDropdownOpen.value;
+};
+
+const changeLanguage = (langCode) => {
+  setLanguage(langCode);
+  isLanguageDropdownOpen.value = false;
 };
 
 const handleNavClick = (url) => {
@@ -76,6 +106,17 @@ onMounted(async () => {
     if (socialResponse && socialResponse.length > 0) {
       socialIcons.value = socialResponse;
     }
+
+
+    const baseUrl = import.meta.env.VITE_DIRECTUS_URL || '';
+    const headerResponse = await fetch(`${baseUrl}/items/header?fields=*,items.*,translations.*`);
+    const headerJson = await headerResponse.json();
+        
+    if (headerJson.data && headerJson.data.length > 0) {
+      headerData.value = headerJson.data[0];
+    }
+
+
   } catch (error) {
     console.error('Error fetching mobile nav data:', error);
   }
@@ -90,8 +131,7 @@ onMounted(async () => {
             <span class="mobile-nav__close mobile-nav__toggler" @click="toggleMobileNav"><i class="fa fa-times"></i></span>
             <div class="logo-box">
                 <a href="#" @click.prevent="handleNavClick('/')" aria-label="logo image">
-                    <img src="https://dreamlayout.mnsithub.com/php/tanspotphp/assets/images/resources/logo-3.png"
-                        width="140" alt="Tanspot Logo">
+                    <a href="/"><img :src="getLogoUrl || ''" width="140" alt="west east freight"></a>
                 </a>
             </div>
             <!-- /.logo-box -->
@@ -115,10 +155,13 @@ onMounted(async () => {
                     
                     <!-- User Menu Items -->
                     <li v-if="isAuthenticated">
-                        <a href="#" @click.prevent="handleNavClick('/my-account')">My Account</a>
+                        <a href="#" @click.prevent="handleNavClick('/my-account')">{{ t.myAccount }}</a>
                     </li>
                     <li v-else>
-                        <a href="#" @click.prevent="handleNavClick('/login')">Login</a>
+                        <a href="#" @click.prevent="handleNavClick('/login')">{{ t.login }}</a>
+                    </li>
+                    <li>
+                        <a href="#" @click.prevent="handleNavClick('/request-quote')">{{ t.requestQuote }}</a>
                     </li>
                 </ul>
             </div>
@@ -134,6 +177,25 @@ onMounted(async () => {
                     <a :href="'tel:' + currentTranslation.phone">{{ currentTranslation.phone }}</a>
                 </li>
             </ul><!-- /.mobile-nav__contact -->
+            
+            <!-- Language Selector -->
+            <div class="mobile-nav__language">
+                <div class="language-selector" @click="toggleLanguageDropdown">
+                    <img :src="`https://flagcdn.com/w20/${currentLanguageInfo.flag}.png`" :alt="currentLanguageInfo.name" class="current-flag">
+                    <span>{{ currentLanguageInfo.name }}</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <ul class="language-dropdown" :class="{ 'show': isLanguageDropdownOpen }">
+                    <li v-for="lang in languages" :key="lang.code" :class="{ 'active': currentLanguage === lang.fullCode }">
+                        <a href="#" @click.prevent="changeLanguage(lang.code)">
+                            <img :src="`https://flagcdn.com/w20/${lang.flag}.png`" :alt="lang.name">
+                            {{ lang.name }}
+                            <i v-if="currentLanguage === lang.fullCode" class="fas fa-check"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
             <div class="mobile-nav__top">
                 <div class="mobile-nav__social" v-if="socialIcons.length > 0">
                     <a v-for="social in socialIcons" :key="social.id" :href="social.link" target="_blank" rel="noopener noreferrer">
@@ -167,5 +229,108 @@ onMounted(async () => {
 
 .mobile-nav__social a img {
     filter: brightness(0) invert(1);
+}
+
+/* Language Selector Styles */
+.mobile-nav__language {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.language-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.language-selector:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.language-selector .current-flag {
+    width: 20px;
+    height: auto;
+}
+
+.language-selector span {
+    flex: 1;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.language-selector i {
+    color: #fff;
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.language-selector:hover i {
+    transform: rotate(180deg);
+}
+
+.language-dropdown {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0 0;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.language-dropdown.show {
+    max-height: 200px;
+    opacity: 1;
+    margin-top: 10px;
+}
+
+.language-dropdown li {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.language-dropdown li:last-child {
+    border-bottom: none;
+}
+
+.language-dropdown li.active a {
+    background: rgba(224, 62, 45, 0.2);
+}
+
+.language-dropdown li a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.language-dropdown li a:hover {
+    background: var(--tanspot-base, #e03e2d);
+}
+
+.language-dropdown li a img {
+    width: 20px;
+    height: auto;
+}
+
+.language-dropdown li a .fa-check {
+    margin-left: auto;
+    color: var(--tanspot-base, #e03e2d);
+    font-size: 14px;
+}
+
+.language-dropdown li a:hover .fa-check {
+    color: #fff;
 }
 </style>
