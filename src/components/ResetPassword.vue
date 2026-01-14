@@ -9,7 +9,7 @@
         <!-- Logo Section -->
         <div class="logo-section">
           <router-link to="/" class="logo-link">
-            <img src="/logo.png" alt="Logo" class="reset-logo" onerror="this.style.display='none'">
+            <img :src="logoUrl" alt="Logo" class="reset-logo" v-if="logoUrl">
           </router-link>
         </div>
 
@@ -116,7 +116,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuth } from '@/composables/useAuth';
 import Swal from 'sweetalert2';
@@ -134,8 +134,35 @@ const resetToken = ref('');
 const errorMessage = ref('');
 const isLoading = ref(false);
 const isSuccess = ref(false);
+const headerData = ref(null);
+
+// Compute logo URL
+const logoUrl = computed(() => {
+  if (headerData.value?.logo) {
+    const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+    return `${baseUrl}/assets/${headerData.value.logo}`;
+  }
+  return '/assets/img/logo.png';
+});
+
+// Fetch header data for logo
+const fetchHeaderData = async () => {
+  try {
+    const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
+    const response = await fetch(`${baseUrl}/items/header?fields=logo`);
+    const data = await response.json();
+    if (data.data && data.data.length > 0) {
+      headerData.value = data.data[0];
+    }
+  } catch (error) {
+    console.error('Failed to fetch header data:', error);
+  }
+};
 
 onMounted(() => {
+  // Fetch logo
+  fetchHeaderData();
+  
   // Get token from URL query parameter
   resetToken.value = route.query.token || '';
   
