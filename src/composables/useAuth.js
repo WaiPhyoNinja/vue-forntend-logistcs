@@ -18,7 +18,8 @@ export function useAuth() {
         },
         body: JSON.stringify({
           email,
-          password
+          password,
+          mode: 'json'
         })
       });
 
@@ -42,7 +43,13 @@ export function useAuth() {
 
       if (data.data && data.data.access_token) {
         token.value = data.data.access_token;
+        const refreshToken = data.data.refresh_token;
+        
+        // Store tokens with expiration time (24 hours from now)
+        const expiresAt = new Date().getTime() + (24 * 60 * 60 * 1000); // 24 hours
         localStorage.setItem('auth_token', data.data.access_token);
+        localStorage.setItem('auth_refresh_token', refreshToken);
+        localStorage.setItem('auth_expires_at', expiresAt.toString());
         
         // Fetch user data
         await getCurrentUser();
@@ -153,6 +160,7 @@ export function useAuth() {
       token.value = null;
       localStorage.removeItem('auth_token');
       localStorage.removeItem('auth_refresh_token');
+      localStorage.removeItem('auth_expires_at');
     }
   };
 
@@ -203,7 +211,66 @@ export function useAuth() {
   // Check if user is logged in on app start
   const checkAuth = async () => {
     if (token.value) {
+      // Check if token is expired or about to expire
+      const expiresAt = localStorage.getItem('auth_expires_at');
+      const now = new Date().getTime();
+      
+      if (expiresAt && now >= parseInt(expiresAt)) {
+        // Token expired, try to refresh
+        const refreshed = await refreshToken();
+        if (!refreshed) {
+          // Refresh failed, logout
+          await logout();
+          return;
+        }
+      }
+      
       await getCurrentUser();
+    }
+  };
+
+  // Refresh token function
+  const refreshToken = async () => {
+    try {
+      const refresh_token = localStorage.getItem('auth_refresh_token');
+      if (!refresh_token) {
+        return false;
+      }
+
+      const response = await fetch('https://admin.westeastfreight.com/auth/refresh', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          refresh_token,
+          mode: 'json'
+        })
+      });
+
+      if (!response.ok) {
+        return false;
+      }
+
+      const data = await response.json();
+
+      if (data.data && data.data.access_token) {
+        token.value = data.data.access_token;
+        const newRefreshToken = data.data.refresh_token;
+        
+        // Update tokens with new expiration time (24 hours from now)
+        const expiresAt = new Date().getTime() + (24 * 60 * 60 * 1000);
+        localStorage.setItem('auth_token', data.data.access_token);
+        localStorage.setItem('auth_refresh_token', newRefreshToken);
+        localStorage.setItem('auth_expires_at', expiresAt.toString());
+        
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error('Token refresh error:', error);
+      return false;
     }
   };
 
@@ -306,6 +373,7 @@ export function useAuth() {
     logout,
     getCurrentUser,
     checkAuth,
+    refreshToken,
     requestPasswordReset,
     resetPassword
   };
