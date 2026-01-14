@@ -10,71 +10,44 @@
                     <div class="sidebar-info-contents">
                         <div class="content-inner">
                             <div class="logo">
-                                <a href="index.php"><img src="https://dreamlayout.mnsithub.com/php/tanspotphp/assets/images/resources/logo-3.png" alt=""></a>
+                                <a href="/"><img :src="getLogoUrl" width="170" alt="Logo"></a>
                             </div>
+                            
+                            <!-- Menu Links -->
                             <div class="content-box">
-                                <h4>About Us</h4>
-                                <div class="inner-text">
-                                    <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has
-                                        roots in a piece of classical Latin literature from 45 BC, making it over
-                                        2000 years old.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="form-inner">
-                                <h4>Get a free quote</h4>
-                                <form action="https://dreamlayout.mnsithub.com/php/tanspotphp/assets/inc/sendemail.php" method="POST" class="contact-form-validated" novalidate="novalidate">
-                                    <input type="hidden" name="_token" value="09f63a98074e85451fec47ef63ccf82ea80a1475e165d9d1796879852c24d9ae">
-                                    <div class="form-group">
-                                        <input type="text" name="name" placeholder="Name" required="" aria-required="true">
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="email" name="email" placeholder="Email" required="" aria-required="true">
-                                    </div>
-                                    <div class="form-group">
-                                        <textarea name="message" placeholder="Message..." required="" aria-required="true"></textarea>
-                                    </div>
-                                    <div class="form-group message-btn">
-                                        <button class="thm-btn" data-text="Submit Now +" type="submit" data-loading-text="Please wait...">Submit Now
-                                            <span><i class="icon-right-arrow"></i></span>
-                                        </button>
-                                    </div>
-                                    <div class="result"></div>
-                                </form>
-
-
+                                <h4>Quick Links</h4>
+                                <ul class="sidebar-menu list-unstyled">
+                                    <li v-for="item in menuItems" :key="item.id">
+                                        <a :href="item.url || '#'">
+                                            {{ getMenuItemTranslation(item)?.title || item.url }}
+                                        </a>
+                                    </li>
+                                </ul>
                             </div>
 
                             <div class="sidebar-contact-info">
                                 <h4>Contact Info</h4>
                                 <ul class="list-unstyled">
-                                    <li>
-                                        <span class="icon-location1"></span> 88 broklyn street, New York
+                                    <li v-if="currentTranslation?.address">
+                                        <span class="icon-location1"></span> {{ currentTranslation.address }}
                                     </li>
-                                    <li>
+                                    <li v-if="currentTranslation?.phone">
                                         <span class="icon-phone-call"></span>
-                                        <a href="tel:123456789">+1 555-9990-153</a>
+                                        <a :href="'tel:' + currentTranslation.phone">{{ currentTranslation.phone }}</a>
                                     </li>
-                                    <li>
+                                    <li v-if="currentTranslation?.email">
                                         <span class="icon-email"></span>
-                                        <a href="mailto:info@example.com">info@example.com</a>
+                                        <a :href="'mailto:' + currentTranslation.email">{{ currentTranslation.email }}</a>
                                     </li>
                                 </ul>
                             </div>
-                            <div class="thm-social-link1">
+                            
+                            <div class="thm-social-link1" v-if="socialIcons.length > 0">
                                 <ul class="social-box list-unstyled">
-                                    <li>
-                                        <a href="#"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
-                                    </li>
-                                    <li>
-                                        <a href="#"><i class="fab fa-twitter" aria-hidden="true"></i></a>
-                                    </li>
-                                    <li>
-                                        <a href="#"><i class="fab fa-pinterest-p" aria-hidden="true"></i></a>
-                                    </li>
-                                    <li>
-                                        <a href="#"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                                    <li v-for="social in socialIcons" :key="social.id">
+                                        <a :href="social.link" target="_blank" rel="noopener noreferrer">
+                                            <img :src="getSocialIconUrl(social.icon)" :alt="social.link" style="width: 16px; height: 16px; object-fit: contain; filter: brightness(0) invert(1);">
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
@@ -85,3 +58,117 @@
         </div>
     </div>
 </template>
+
+<script setup>
+import { ref, onMounted, computed } from 'vue';
+import directus from '@/services/directus';
+import { readItems } from '@directus/sdk';
+import { useLanguage } from '@/composables/useLanguage';
+
+const { currentLanguage, getTranslation } = useLanguage();
+const locationData = ref(null);
+const socialIcons = ref([]);
+const menuItems = ref([]);
+const headerData = ref(null);
+
+const currentTranslation = computed(() => {
+  if (!locationData.value || !locationData.value.translations) return null;
+  return getTranslation(locationData.value.translations);
+});
+
+const getMenuItemTranslation = (item) => {
+  if (!item.translations || !Array.isArray(item.translations)) return null;
+  return getTranslation(item.translations);
+};
+
+const getSocialIconUrl = (iconId) => {
+  if (!iconId) return '';
+  const baseUrl = import.meta.env.VITE_DIRECTUS_URL || '';
+  return `${baseUrl}/assets/${iconId}`;
+};
+
+const getLogoUrl = computed(() => {
+  if (!headerData.value?.logo) return '';
+  const baseUrl = import.meta.env.VITE_DIRECTUS_URL || '';
+  return `${baseUrl}/assets/${headerData.value.logo}`;
+});
+
+onMounted(async () => {
+  try {
+    // Fetch menu from Directus
+    const menuResponse = await directus.request(
+      readItems('menu', {
+        fields: ['*', 'items.*', 'items.translations.*'],
+        filter: { menu_id: { _eq: 'header' }, is_active: { _eq: true } }
+      })
+    );
+    
+    if (menuResponse && menuResponse.length > 0) {
+      menuItems.value = menuResponse[0].items || [];
+    }
+
+    // Fetch location data
+    const response = await directus.request(
+      readItems('locations', {
+        fields: ['*', 'translations.*'],
+        filter: { status: { _eq: 'published' } }
+      })
+    );
+    
+    if (response && response.length > 0) {
+      locationData.value = response[0];
+    }
+
+    // Fetch social icons
+    const socialResponse = await directus.request(
+      readItems('social_icons', {
+        fields: ['*', 'translations.*'],
+        filter: { status: { _eq: true } }
+      })
+    );
+    
+    if (socialResponse && socialResponse.length > 0) {
+      socialIcons.value = socialResponse;
+    }
+
+    // Fetch header data (logo)
+    const baseUrl = import.meta.env.VITE_DIRECTUS_URL || '';
+    const headerResponse = await fetch(`${baseUrl}/items/header?fields=*,items.*,translations.*`);
+    const headerJson = await headerResponse.json();
+        
+    if (headerJson.data && headerJson.data.length > 0) {
+      headerData.value = headerJson.data[0];
+    }
+  } catch (error) {
+    console.error('Error fetching slider widget data:', error);
+  }
+});
+</script>
+
+<style scoped>
+.sidebar-menu {
+    padding-left: 0;
+    margin: 20px 0;
+}
+
+.sidebar-menu li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-menu li:last-child {
+    border-bottom: none;
+}
+
+.sidebar-menu li a {
+    color: #fff;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.sidebar-menu li a:hover {
+    color: var(--tanspot-base, #e03e2d);
+    padding-left: 10px;
+}
+</style>
