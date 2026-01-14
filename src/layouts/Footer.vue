@@ -77,7 +77,7 @@
                     <div class="col-xl-3 col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="400ms">
                         <div class="footer-widget__column footer-widget__contact">
                             <div class="footer-widget__title-box">
-                                <h3 class="footer-widget__title">Contact</h3>
+                                <h3 class="footer-widget__title">{{ t.contact }}</h3>
                             </div>
                             <ul class="footer-widget__contact-list list-unstyled">
                                 <li>
@@ -118,9 +118,9 @@
                     <div class="site-footer__bottom-inner">
                         <p class="site-footer__bottom-text">© Copywright 2025 by <a href="/">westeastfreight.com</a> All Rights Reserved.</p>
                         <ul class="list-unstyled site-footer__bottom-menu">
-                            <li><router-link to="/contact">Support</router-link></li>
-                            <li><a href="#">Terms and Condition</a></li>
-                            <li><a href="#">Privacy and Policy</a></li>
+                            <li><router-link to="/contact">{{ t.support }}</router-link></li>
+                            <li><a href="#">{{ t.termsAndCondition }}</a></li>
+                            <li><a href="#">{{ t.privacyAndPolicy }}</a></li>
                         </ul>
                     </div>
                 </div>
@@ -134,8 +134,10 @@ import { ref, onMounted, computed } from 'vue';
 import directus from '@/services/directus';
 import { readItems } from '@directus/sdk';
 import { useLanguage } from '@/composables/useLanguage';
+import { commonTranslations } from '@/locales/common';
 
-const { getTranslation } = useLanguage();
+const { currentLanguage, getTranslation } = useLanguage();
+const t = computed(() => commonTranslations[currentLanguage.value] || commonTranslations['en-US']);
 const email = ref('');
 const locationData = ref(null);
 const footerData = ref(null);
