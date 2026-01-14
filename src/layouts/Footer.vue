@@ -168,6 +168,7 @@ const servicesTitle = computed(() => {
 });
 
 const footerLogoUrl = computed(() => {
+  if (!footerData.value?.footer_logo) return '';
   const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
   return `${baseUrl}/assets/${footerData.value.footer_logo}`;
 });
