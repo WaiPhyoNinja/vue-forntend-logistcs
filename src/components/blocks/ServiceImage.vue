@@ -7,7 +7,7 @@
                 <div class="services-one__single">
                     <div class="services-one__img-box">
                         <div class="services-one__img">
-                            <img :src="getImageUrl(service.masthead_image)" :alt="getTranslation(service)?.title || ''">
+                            <img :src="getImageUrl(service.masthead_image)" width="300" height="250" :alt="getTranslation(service)?.title || ''">
                         </div>
                         <div class="services-one__icon">
                             <span :class="getServiceIcon(service.services_type)"></span>
