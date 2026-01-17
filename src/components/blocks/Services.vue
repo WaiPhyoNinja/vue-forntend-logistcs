@@ -7,7 +7,7 @@
                     <div class="section-title__shape-1">
                         <i class="fas fa-plane"></i>
                     </div>
-                    <h6 class="section-title__tagline">{{ translatedContent?.title || 'Our Services' }}</h6>
+                    <h6 class="section-title__tagline">{{ translatedContent?.title || 'Our Solutions' }}</h6>
                     <span class="section-title__tagline-border"></span>
                     <div class="section-title__shape-2">
                         <i class="fas fa-plane"></i>

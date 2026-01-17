@@ -6,7 +6,7 @@ export const commonTranslations = {
     contact: 'Contact',
     blog: 'Blog',
     news: 'News',
-    ourServices: 'Our Services',
+    ourServices: 'Our Solutions',
     ifYouNeedHelp: 'If You Need Any Help',
     contactWithUs: 'Contact With Us',
     downloadBrochure: 'Download Brochure',
