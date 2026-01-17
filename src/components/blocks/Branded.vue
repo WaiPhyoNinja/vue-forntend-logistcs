@@ -4,7 +4,7 @@
             <div class="brand-one__carousel owl-carousel owl-theme">
                 <div class="brand-one__single" v-for="(image, index) in brandImages" :key="index">
                     <div class="brand-one__single-inner">
-                        <a href="#"><img :src="getImageUrl(image)" alt=""></a>
+                        <a href="#"><img :src="getImageUrl(image)" alt="" width="115" height="105"></a>
                     </div>
                 </div>
             </div>
