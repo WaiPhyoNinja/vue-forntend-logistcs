@@ -236,7 +236,7 @@
                                             </div> -->
                                             <div class="billing_input_box">
                                                 <label>{{ t.country }} {{ t.required }}</label>
-                                                <select v-model="formData.sender.country" class="form-select" required>
+                                                <select v-model="formData.receiver.country" class="form-select" required>
                                                     <option value="">{{ t.selectCountry }}</option>
                                                     <option v-for="item in countries" :key="item.id" :value="item.country_name">
                                                         {{ item.country_name }}
