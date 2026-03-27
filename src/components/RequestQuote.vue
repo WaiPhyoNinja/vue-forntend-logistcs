@@ -450,7 +450,7 @@
                                         <p><i class="fas fa-box"></i> {{ t.shipmentTypeLabel }}</p>
                                     </div>
                                     <div class="right-text">
-                                        <p>{{ formData.shipment.type ? escapeHtml(formData.shipment.type) : '-' }}</p>
+                                        <p>{{ formData.shipment.type || '-' }}</p>
                                     </div>
                                 </li>
 
@@ -459,7 +459,7 @@
                                         <p><i class="fas fa-shipping-fast"></i> {{ t.serviceLabel }}</p>
                                     </div>
                                     <div class="right-text">
-                                        <p>{{ formData.shipment.service ? escapeHtml(formData.shipment.service) : '-' }}</p>
+                                        <p>{{ formData.shipment.service || '-' }}</p>
                                     </div>
                                 </li>
 
@@ -575,14 +575,6 @@ import { quoteTranslations } from '@/locales/quote'
 import { createItem, updateItem } from '@directus/sdk'
 import directus from '@/services/directus'
 import Swal from 'sweetalert2'
-import {
-  sanitizeInput,
-  escapeHtml,
-  validateFormStep,
-  sanitizeFormData,
-  createSubmissionRateLimiter,
-  validateCompleteForm,
-} from '@/utils/validation'
 
 const router = useRouter()
 const { isAuthenticated, user, checkAuth } = useAuth()
@@ -590,13 +582,7 @@ const { currentLanguage } = useLanguage()
 const isSubmitting = ref(false)
 const currentStep = ref(1)
 const editQuoteId = ref(null)
-const countries = ref([])
-
-// Rate limiter to prevent multiple submissions
-const submissionLimiter = createSubmissionRateLimiter(1000)
-
-// Form errors state
-const formErrors = ref({});
+const countries = ref([]);
 
 // Translation helper
 const useQuoteTranslation = (lang) => {
@@ -670,17 +656,17 @@ fetchCountries();
 const senderLocation = computed(() => {
     const { city, country } = formData.value.sender
     if (city && country) {
-        return `${escapeHtml(city)}, ${escapeHtml(country.charAt(0).toUpperCase() + country.slice(1))}`
+        return `${city}, ${country.charAt(0).toUpperCase() + country.slice(1)}`
     }
-    return city ? escapeHtml(city) : (country ? escapeHtml(country) : null)
+    return city || country ? (city || country) : null
 })
 
 const receiverLocation = computed(() => {
     const { city, country } = formData.value.receiver
     if (city && country) {
-        return `${escapeHtml(city)}, ${escapeHtml(country.charAt(0).toUpperCase() + country.slice(1))}`
+        return `${city}, ${country.charAt(0).toUpperCase() + country.slice(1)}`
     }
-    return city ? escapeHtml(city) : (country ? escapeHtml(country) : null)
+    return city || country ? (city || country) : null
 })
 
 const handleSubmit = async () => {
@@ -710,74 +696,47 @@ const handleSubmit = async () => {
         return
     }
 
-    // Rate limiting - prevent rapid submissions
-    if (!submissionLimiter.canSubmit()) {
-        await Swal.fire({
-            title: 'Please wait',
-            text: 'Please wait before submitting again',
-            icon: 'warning',
-            confirmButtonColor: '#e03e2d'
-        })
-        return
-    }
-
-    // Validate complete form before submission
-    const completeValidation = validateCompleteForm(formData.value)
-    if (!completeValidation.isValid) {
-        const errorMessages = Object.values(completeValidation.errors).join('\n')
-        await Swal.fire({
-            title: 'Form Validation Error',
-            text: 'Please fix the following errors:\n' + errorMessages,
-            icon: 'error',
-            confirmButtonColor: '#e03e2d'
-        })
-        return
-    }
-
     isSubmitting.value = true
 
     try {
-        // Sanitize form data before submission
-        const sanitizedData = sanitizeFormData(formData.value)
-
         // Prepare data for Directus
         const quoteData = {
             // Sender information
-            sender_first_name: sanitizedData.sender.firstName,
-            sender_last_name: sanitizedData.sender.lastName,
-            sender_company: sanitizedData.sender.company || null,
-            sender_email: sanitizedData.sender.email,
-            sender_phone: sanitizedData.sender.phone,
-            sender_address: sanitizedData.sender.address,
-            sender_city: sanitizedData.sender.city,
-            sender_state: sanitizedData.sender.state,
-            sender_country: sanitizedData.sender.country,
-            sender_postal_code: sanitizedData.sender.postalCode || null,
+            sender_first_name: formData.value.sender.firstName,
+            sender_last_name: formData.value.sender.lastName,
+            sender_company: formData.value.sender.company || null,
+            sender_email: formData.value.sender.email,
+            sender_phone: formData.value.sender.phone,
+            sender_address: formData.value.sender.address,
+            sender_city: formData.value.sender.city,
+            sender_state: formData.value.sender.state,
+            sender_country: formData.value.sender.country,
+            sender_postal_code: formData.value.sender.postalCode || null,
             
             // Receiver information
-            receiver_first_name: sanitizedData.receiver.firstName,
-            receiver_last_name: sanitizedData.receiver.lastName,
-            receiver_company: sanitizedData.receiver.company || null,
-            receiver_email: sanitizedData.receiver.email,
-            receiver_phone: sanitizedData.receiver.phone,
-            receiver_address: sanitizedData.receiver.address,
-            receiver_city: sanitizedData.receiver.city,
-            receiver_state: sanitizedData.receiver.state,
-            receiver_country: sanitizedData.receiver.country,
-            receiver_postal_code: sanitizedData.receiver.postalCode || null,
+            receiver_first_name: formData.value.receiver.firstName,
+            receiver_last_name: formData.value.receiver.lastName,
+            receiver_company: formData.value.receiver.company || null,
+            receiver_email: formData.value.receiver.email,
+            receiver_phone: formData.value.receiver.phone,
+            receiver_address: formData.value.receiver.address,
+            receiver_city: formData.value.receiver.city,
+            receiver_state: formData.value.receiver.state,
+            receiver_country: formData.value.receiver.country,
+            receiver_postal_code: formData.value.receiver.postalCode || null,
             
             // Shipment information
-            shipment_type: sanitizedData.shipment.type,
-            service_type: sanitizedData.shipment.service,
-            weight: sanitizedData.shipment.weight ? parseFloat(sanitizedData.shipment.weight) : null,
-            length: sanitizedData.shipment.length ? parseFloat(sanitizedData.shipment.length) : null,
-            width: sanitizedData.shipment.width ? parseFloat(sanitizedData.shipment.width) : null,
-            height: sanitizedData.shipment.height ? parseFloat(sanitizedData.shipment.height) : null,
-            quantity: sanitizedData.shipment.quantity ? parseInt(sanitizedData.shipment.quantity) : 1,
-            declared_value: sanitizedData.shipment.declaredValue ? parseFloat(sanitizedData.shipment.declaredValue) : null,
-            description: sanitizedData.shipment.description,
-            special_instructions: sanitizedData.shipment.specialInstructions || null,
-            insurance: Boolean(sanitizedData.shipment.insurance),
+            shipment_type: formData.value.shipment.type,
+            service_type: formData.value.shipment.service,
+            weight: parseFloat(formData.value.shipment.weight),
+            length: formData.value.shipment.length ? parseFloat(formData.value.shipment.length) : null,
+            width: formData.value.shipment.width ? parseFloat(formData.value.shipment.width) : null,
+            height: formData.value.shipment.height ? parseFloat(formData.value.shipment.height) : null,
+            quantity: parseInt(formData.value.shipment.quantity),
+            declared_value: formData.value.shipment.declaredValue ? parseFloat(formData.value.shipment.declaredValue) : null,
+            description: formData.value.shipment.description,
+            special_instructions: formData.value.shipment.specialInstructions || null,
+            insurance: formData.value.shipment.insurance,
             status: 'pending'
         }
 
@@ -797,6 +756,8 @@ const handleSubmit = async () => {
         console.log('Submitting quote request to Directus:', quoteData)
         console.log('User ID:', user.value?.id)
         console.log('Is editing:', !!editQuoteId.value)
+        console.log('user_created in quoteData:', quoteData.user_created)
+        console.log('user_updated in quoteData:', quoteData.user_updated)
 
         // Get authentication token
         const authToken = localStorage.getItem('auth_token')
@@ -898,25 +859,20 @@ const prevStep = () => {
 }
 
 const validateCurrentStep = () => {
-    // Use comprehensive validation
-    const validation = validateFormStep(formData.value, currentStep.value)
-    
-    if (!validation.isValid) {
-        formErrors.value = validation.errors
-        
-        // Show error message
-        const errorMessages = Object.values(validation.errors).join('\n')
-        Swal.fire({
-            title: 'Validation Error',
-            text: errorMessages,
-            icon: 'error',
-            confirmButtonColor: '#e03e2d'
-        })
-        return false
+    // Basic validation for each step
+    if (currentStep.value === 1) {
+        const { firstName, lastName, email, phone, address, city, state, country } = formData.value.sender
+        if (!firstName || !lastName || !email || !phone || !address || !city || !state || !country) {
+            alert(t.value.fillRequired)
+            return false
+        }
+    } else if (currentStep.value === 2) {
+        const { firstName, lastName, email, phone, address, city, state, country } = formData.value.receiver
+        if (!firstName || !lastName || !email || !phone || !address || !city || !state || !country) {
+            alert(t.value.fillRequiredReceiver)
+            return false
+        }
     }
-    
-    // Clear errors if validation passes
-    formErrors.value = {}
     return true
 }
 
