@@ -112,7 +112,7 @@
 
                                     <div class="row bs-gutter-x-20">
                                         <div class="col-xl-6">
-                                            <div class="billing_input_box">
+                                            <!-- <div class="billing_input_box">
                                                 <label>{{ t.country }} {{ t.required }}</label>
                                                 <select v-model="formData.sender.country" class="form-select" required>
                                                     <option value="">{{ t.selectCountry }}</option>
@@ -121,6 +121,15 @@
                                                     <option value="singapore">{{ t.singapore }}</option>
                                                     <option value="malaysia">{{ t.malaysia }}</option>
                                                     <option value="vietnam">{{ t.vietnam }}</option>
+                                                </select>
+                                            </div> -->
+                                            <div class="billing_input_box">
+                                                <label>{{ t.country }} {{ t.required }}</label>
+                                                <select v-model="formData.sender.country" class="form-select" required>
+                                                    <option value="">{{ t.selectCountry }}</option>
+                                                    <option v-for="item in countries" :key="item.id" :value="item.country_name">
+                                                        {{ item.country_name }}
+                                                    </option>
                                                 </select>
                                             </div>
                                         </div>
@@ -213,7 +222,7 @@
 
                                     <div class="row bs-gutter-x-20">
                                         <div class="col-xl-6">
-                                            <div class="billing_input_box">
+                                            <!-- <div class="billing_input_box">
                                                 <label>{{ t.country }} {{ t.required }}</label>
                                                 <select v-model="formData.receiver.country" class="form-select"
                                                     required>
@@ -223,6 +232,15 @@
                                                     <option value="singapore">{{ t.singapore }}</option>
                                                     <option value="malaysia">{{ t.malaysia }}</option>
                                                     <option value="vietnam">{{ t.vietnam }}</option>
+                                                </select>
+                                            </div> -->
+                                            <div class="billing_input_box">
+                                                <label>{{ t.country }} {{ t.required }}</label>
+                                                <select v-model="formData.sender.country" class="form-select" required>
+                                                    <option value="">{{ t.selectCountry }}</option>
+                                                    <option v-for="item in countries" :key="item.id" :value="item.country_name">
+                                                        {{ item.country_name }}
+                                                    </option>
                                                 </select>
                                             </div>
                                         </div>
@@ -564,6 +582,7 @@ const { currentLanguage } = useLanguage()
 const isSubmitting = ref(false)
 const currentStep = ref(1)
 const editQuoteId = ref(null)
+const countries = ref([]);
 
 // Translation helper
 const useQuoteTranslation = (lang) => {
@@ -618,6 +637,20 @@ const formData = ref({
         insurance: false
     }
 })
+
+const fetchCountries = async () => {
+    try {
+        const response = await fetch(`${baseUrl}/items/quote_country?fields=id,country_name,value`);
+        const json = await response.json();
+        if (json.data) {
+            countries.value = json.data;
+        }
+    } catch (error) {
+        console.error("Error fetching countries:", error);
+    }
+};
+
+fetchCountries();
 
 const senderLocation = computed(() => {
     const { city, country } = formData.value.sender
@@ -888,7 +921,9 @@ const resetForm = () => {
 // Restore form data if user returns from login
 onMounted(async () => {
     await checkAuth()
-    
+
+    await fetchCountries();
+
     // Check for edit mode first
     const editData = sessionStorage.getItem('editQuoteData')
     if (editData && isAuthenticated.value) {
