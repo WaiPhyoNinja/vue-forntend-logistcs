@@ -640,6 +640,7 @@ const formData = ref({
 
 const fetchCountries = async () => {
     try {
+        const baseUrl = import.meta.env.VITE_DIRECTUS_URL || 'http://0.0.0.0:8055';
         const response = await fetch(`${baseUrl}/items/quote_country?fields=id,country_name,value`);
         const json = await response.json();
         if (json.data) {
