@@ -447,7 +447,7 @@
                             <ul class="sidebar-quote-summary__list list-unstyled">
                                 <li>
                                     <div class="left-text">
-                                        <p><i class="fas fa-box"></i> {{ t.value.shipmentTypeLabel }}</p>
+                                        <p><i class="fas fa-box"></i> {{ t.shipmentTypeLabel }}</p>
                                     </div>
                                     <div class="right-text">
                                         <p>{{ formData.shipment.type ? escapeHtml(formData.shipment.type) : '-' }}</p>
@@ -456,7 +456,7 @@
 
                                 <li>
                                     <div class="left-text">
-                                        <p><i class="fas fa-shipping-fast"></i> {{ t.value.serviceLabel }}</p>
+                                        <p><i class="fas fa-shipping-fast"></i> {{ t.serviceLabel }}</p>
                                     </div>
                                     <div class="right-text">
                                         <p>{{ formData.shipment.service ? escapeHtml(formData.shipment.service) : '-' }}</p>
@@ -465,7 +465,7 @@
 
                                 <li>
                                     <div class="left-text">
-                                        <p><i class="fas fa-weight"></i> {{ t.value.weightLabel }}</p>
+                                        <p><i class="fas fa-weight"></i> {{ t.weightLabel }}</p>
                                     </div>
                                     <div class="right-text">
                                         <p>{{ formData.shipment.weight || '0' }} kg</p>
@@ -475,7 +475,7 @@
                                 <li
                                     v-if="formData.shipment.length && formData.shipment.width && formData.shipment.height">
                                     <div class="left-text">
-                                        <p><i class="fas fa-ruler-combined"></i> {{ t.value.dimensionsLabel }}</p>
+                                        <p><i class="fas fa-ruler-combined"></i> {{ t.dimensionsLabel }}</p>
                                     </div>
                                     <div class="right-text">
                                         <p>{{ formData.shipment.length }} × {{ formData.shipment.width }} × {{
@@ -485,16 +485,16 @@
 
                                 <li>
                                     <div class="left-text">
-                                        <p><i class="fas fa-boxes"></i> {{ t.value.quantityLabel }}</p>
+                                        <p><i class="fas fa-boxes"></i> {{ t.quantityLabel }}</p>
                                     </div>
                                     <div class="right-text">
-                                        <p>{{ formData.shipment.quantity || '1' }} {{ t.value.packages }}</p>
+                                        <p>{{ formData.shipment.quantity || '1' }} {{ t.packages }}</p>
                                     </div>
                                 </li>
 
                                 <li v-if="formData.shipment.declaredValue">
                                     <div class="left-text">
-                                        <p><i class="fas fa-dollar-sign"></i> {{ t.value.declaredValueLabel }}</p>
+                                        <p><i class="fas fa-dollar-sign"></i> {{ t.declaredValueLabel }}</p>
                                     </div>
                                     <div class="right-text">
                                         <p>${{ parseFloat(formData.shipment.declaredValue).toFixed(2) }}</p>
@@ -503,10 +503,10 @@
 
                                 <li v-if="formData.shipment.insurance">
                                     <div class="left-text">
-                                        <p><i class="fas fa-shield-alt"></i> {{ t.value.insuranceLabel }}</p>
+                                        <p><i class="fas fa-shield-alt"></i> {{ t.insuranceLabel }}</p>
                                     </div>
                                     <div class="right-text">
-                                        <p class="text-success">{{ t.value.included }}</p>
+                                        <p class="text-success">{{ t.included }}</p>
                                     </div>
                                 </li>
                             </ul>
