@@ -669,6 +669,27 @@ const receiverLocation = computed(() => {
     return city || country ? (city || country) : null
 })
 
+const sanitizeInput = (str) => {
+    if (!str || typeof str !== 'string') return str;
+    return str.replace(/[&<>"']/g, (m) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    })[m]);
+};
+
+
+const showError = (message) => {
+    Swal.fire({
+        title: 'Validation Error',
+        text: message,
+        icon: 'error',
+        confirmButtonColor: '#e03e2d'
+    });
+};
+
 const handleSubmit = async () => {
     // Check if user is authenticated before submitting
     await checkAuth()
@@ -873,6 +894,36 @@ const validateCurrentStep = () => {
             return false
         }
     }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[0-9+]{7,15}$/; 
+
+    if (currentStep.value === 1) {
+        const s = formData.value.sender;
+        if (!s.firstName || !s.lastName || !s.address || !s.city || !s.country) {
+            showError(t.value.fillRequired);
+            return false;
+        }
+        if (!emailRegex.test(s.email)) {
+            showError("Invalid sender email address");
+            return false;
+        }
+        if (!phoneRegex.test(s.phone)) {
+            showError("Invalid sender phone number");
+            return false;
+        }
+    } else if (currentStep.value === 2) {
+        const r = formData.value.receiver;
+        if (!r.firstName || !r.lastName || !r.address || !r.city || !r.country) {
+            showError(t.value.fillRequiredReceiver);
+            return false;
+        }
+        if (!emailRegex.test(r.email)) {
+            showError("Invalid receiver email address");
+            return false;
+        }
+    }
+    
     return true
 }
 
