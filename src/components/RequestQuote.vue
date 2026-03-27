@@ -723,41 +723,41 @@ const handleSubmit = async () => {
         // Prepare data for Directus
         const quoteData = {
             // Sender information
-            sender_first_name: formData.value.sender.firstName,
-            sender_last_name: formData.value.sender.lastName,
-            sender_company: formData.value.sender.company || null,
-            sender_email: formData.value.sender.email,
-            sender_phone: formData.value.sender.phone,
-            sender_address: formData.value.sender.address,
-            sender_city: formData.value.sender.city,
-            sender_state: formData.value.sender.state,
-            sender_country: formData.value.sender.country,
-            sender_postal_code: formData.value.sender.postalCode || null,
+            sender_first_name: sanitizeInput(formData.value.sender.firstName),
+            sender_last_name: sanitizeInput(formData.value.sender.lastName),
+            sender_company: sanitizeInput(formData.value.sender.company) || null,
+            sender_email: sanitizeInput(formData.value.sender.email),
+            sender_phone: sanitizeInput(formData.value.sender.phone),
+            sender_address: sanitizeInput(formData.value.sender.address),
+            sender_city: sanitizeInput(formData.value.sender.city),
+            sender_state: sanitizeInput(formData.value.sender.state),
+            sender_country: sanitizeInput(formData.value.sender.country),
+            sender_postal_code: sanitizeInput(formData.value.sender.postalCode) || null,
             
             // Receiver information
-            receiver_first_name: formData.value.receiver.firstName,
-            receiver_last_name: formData.value.receiver.lastName,
-            receiver_company: formData.value.receiver.company || null,
-            receiver_email: formData.value.receiver.email,
-            receiver_phone: formData.value.receiver.phone,
-            receiver_address: formData.value.receiver.address,
-            receiver_city: formData.value.receiver.city,
-            receiver_state: formData.value.receiver.state,
-            receiver_country: formData.value.receiver.country,
-            receiver_postal_code: formData.value.receiver.postalCode || null,
+            receiver_first_name: sanitizeInput(formData.value.receiver.firstName),
+            receiver_last_name: sanitizeInput(formData.value.receiver.lastName),
+            receiver_company: sanitizeInput(formData.value.receiver.company) || null,
+            receiver_email: sanitizeInput(formData.value.receiver.email),
+            receiver_phone: sanitizeInput(formData.value.receiver.phone),
+            receiver_address: sanitizeInput(formData.value.receiver.address),
+            receiver_city: sanitizeInput(formData.value.receiver.city),
+            receiver_state: sanitizeInput(formData.value.receiver.state),
+            receiver_country: sanitizeInput(formData.value.receiver.country),
+            receiver_postal_code: sanitizeInput(formData.value.receiver.postalCode) || null,
             
             // Shipment information
-            shipment_type: formData.value.shipment.type,
-            service_type: formData.value.shipment.service,
+            shipment_type: sanitizeInput(formData.value.shipment.type),
+            service_type: sanitizeInput(formData.value.shipment.service),
             weight: parseFloat(formData.value.shipment.weight),
-            length: formData.value.shipment.length ? parseFloat(formData.value.shipment.length) : null,
-            width: formData.value.shipment.width ? parseFloat(formData.value.shipment.width) : null,
-            height: formData.value.shipment.height ? parseFloat(formData.value.shipment.height) : null,
-            quantity: parseInt(formData.value.shipment.quantity),
-            declared_value: formData.value.shipment.declaredValue ? parseFloat(formData.value.shipment.declaredValue) : null,
-            description: formData.value.shipment.description,
-            special_instructions: formData.value.shipment.specialInstructions || null,
-            insurance: formData.value.shipment.insurance,
+            length: formData.value.shipment.length ? parseFloat(sanitizeInput(formData.value.shipment.length)) : null,
+            width: formData.value.shipment.width ? parseFloat(sanitizeInput(formData.value.shipment.width)) : null,
+            height: formData.value.shipment.height ? parseFloat(sanitizeInput(formData.value.shipment.height)) : null,
+            quantity: parseInt(sanitizeInput(formData.value.shipment.quantity)),
+            declared_value: formData.value.shipment.declaredValue ? parseFloat(sanitizeInput(formData.value.shipment.declaredValue)) : null,
+            description: sanitizeInput(formData.value.shipment.description),
+            special_instructions: sanitizeInput(formData.value.shipment.specialInstructions) || null,
+            insurance: sanitizeInput(formData.value.shipment.insurance),
             status: 'pending'
         }
 
@@ -923,7 +923,7 @@ const validateCurrentStep = () => {
             return false;
         }
     }
-    
+
     return true
 }
 
